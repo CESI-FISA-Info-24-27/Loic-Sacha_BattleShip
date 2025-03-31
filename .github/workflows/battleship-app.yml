@@ -44,6 +44,8 @@ jobs:
   docs:
     name: Build and Deploy Documentation
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # Required for deploying to GitHub Pages
 
     steps:
       # Checkout the repository
@@ -69,11 +71,11 @@ jobs:
       - name: Build Sphinx Documentation
         run: |
           source .venv/bin/activate
-          make html  # Exécute `make html` depuis la racine
+          make html
 
       # Deploy to GitHub Pages
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: build/html  # Chemin correct pour les fichiers générés
+          publish_dir: build/html
