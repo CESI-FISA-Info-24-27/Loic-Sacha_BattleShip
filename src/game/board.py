@@ -1,6 +1,7 @@
 import pygame
 import string
 from game.button import draw_back_button  # Import directly from button.py
+from game.player import Player
 
 class Board:
     """
@@ -32,10 +33,13 @@ class Board:
         self.grid = [[0 for _ in range(cols)] for _ in range(rows)]  # 0 = empty, 1 = ship, 2 = hit, 3 = miss
         self.font = pygame.font.SysFont(None, 24)  # Font for numbers and letters
         self.title_font = pygame.font.SysFont(None, 48)  # Font for the title
+        self.select_font = pygame.font.SysFont(None, 40)
         self.button_font = pygame.font.SysFont(None, 30)  # Font for the button
         self.player_name = player_name
         self.enemy_name = enemy_name
         self.back_button = None  # Back button
+        
+        self.player = Player(self.player_name)
 
     def draw(self, screen):
         """
@@ -69,6 +73,10 @@ class Board:
         enemy_text = self.font.render(f"Enemy: {self.enemy_name}", True, (255, 255, 255))
         screen.blit(player_text, (10, 60))
         screen.blit(enemy_text, (screen.get_width() - enemy_text.get_width() - 10, 60))
+
+        if sum(len(coords) for coords in self.player.boats.values()) < 20:
+            chose_emplacement = self.select_font.render("Cliquez sur la grille pour placer vos navires.", True, (255, 255, 255))
+            screen.blit(chose_emplacement, (screen.get_width() // 2 - chose_emplacement.get_width() // 2, 110))
 
         # Calculate margins to center the grid
         grid_width = self.cols * self.cell_size
@@ -130,4 +138,23 @@ class Board:
         if event.type == pygame.MOUSEBUTTONDOWN:
             if self.back_button.collidepoint(event.pos):
                 return "menu"  # Return to the main menu
+            self.place_boat(event, self.player)
         return None
+    
+    def place_boat(self, event, player):
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            # Calculer la position du clic dans la grille
+            grid_width = self.cols * self.cell_size
+            grid_height = self.rows * self.cell_size
+            margin_x = (pygame.display.get_surface().get_width() - grid_width) // 2
+            margin_y = (pygame.display.get_surface().get_height() - grid_height) // 2 + 50
+
+            x, y = event.pos
+            col = (x - margin_x) // self.cell_size
+            row = (y - margin_y) // self.cell_size
+
+            if 0 <= col < self.cols and 0 <= row < self.rows:
+                # Vérifie si la case est vide avant d'ajouter un bateau
+                if self.grid[row][col] == 0:
+                    self.grid[row][col] = 1  # Marquer comme bateau
+                    player.set_boat_emplacement(f"Bateau{len(player.boats) + 1}", col + 1, row + 1)
