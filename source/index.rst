@@ -15,3 +15,6 @@ documentation for details.
    :maxdepth: 2
    :caption: Contents:
 
+   modules/utils
+   modules/game
+   modules/main
