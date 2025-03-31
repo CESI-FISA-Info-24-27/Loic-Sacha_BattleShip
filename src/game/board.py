@@ -298,6 +298,16 @@ class Board:
         Raises:
             ValueError: If a position is invalid due to overlap or discontinuity.
         """
+        
+        # List of boats with their sizes
+        boats = [
+            {"type": BoatType.AIRCRAFT_CARRIER, "size": 5},  # 1 boat of size 5
+            {"type": BoatType.CRUISER, "size": 4},           # 1 boat of size 4
+            {"type": BoatType.DESTROYER, "size": 3},         # 1st boat of size 3
+            {"type": BoatType.SUBMARINE, "size": 3},         # 2nd boat of size 3
+            {"type": BoatType.TORPEDO, "size": 2},           # 1 boat of size 2
+        ]
+                    
         if not hasattr(self, "placement_complete") or not self.placement_complete:
             if event.type == pygame.MOUSEBUTTONDOWN:
                 # Calculate the position of the click in the grid
@@ -311,15 +321,7 @@ class Board:
                 row = (y - margin_y) // self.cell_size
 
                 if 0 <= col < self.cols and 0 <= row < self.rows:
-                    # List of boats with their sizes
-                    boats = [
-                        {"type": BoatType.AIRCRAFT_CARRIER, "size": 5},  # 1 boat of size 5
-                        {"type": BoatType.CRUISER, "size": 4},           # 1 boat of size 4
-                        {"type": BoatType.DESTROYER, "size": 3},         # 1st boat of size 3
-                        {"type": BoatType.SUBMARINE, "size": 3},         # 2nd boat of size 3
-                        {"type": BoatType.TORPEDO, "size": 2},           # 1 boat of size 2
-                    ]
-
+                    
                     # Check if a boat is currently being placed
                     if not hasattr(self, "current_boat_index"):
                         self.current_boat_index = 0  # Index of the boat to place
@@ -365,8 +367,9 @@ class Board:
                             self.placement_complete = True  # Mark placement as complete
 
         # Display the boat currently being placed
-        if hasattr(self, "current_boat") and not self.placement_complete:
-            print(f"Placer le bateau : {self.current_boat['name']} (taille : {self.current_boat['size']})")
+        if not hasattr(self, "current_boat_index"):
+            self.current_boat_index = 0  # Index du bateau à placer
+            self.current_boat = {"name": boats[self.current_boat_index]["type"].value, "positions": [], "size": boats[self.current_boat_index]["size"]}
 
     def is_continuous(self, positions, new_position):
         """
@@ -446,12 +449,10 @@ class Board:
                             hit = True
                             boat_positions.remove((row, col))  # Remove the hit position
                             self.grid[row][col] = 2  # Mark as hit
-                            print(f"Hit at ({row}, {col})!")
                             break
 
                     if not hit:
                         self.grid[row][col] = 3  # Mark as missed
-                        print(f"Missed at ({row}, {col}).")
 
                     # Switch to the AI's turn
                     self.player_turn = False
