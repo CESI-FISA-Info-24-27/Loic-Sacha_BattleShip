@@ -3,6 +3,28 @@ import string
 from game.button import draw_back_button  # Import directly from button.py
 
 class Board:
+    """
+    Represents the game board for the Battleship game.
+    Attributes:
+        rows (int): Number of rows in the grid. Default is 10.
+        cols (int): Number of columns in the grid. Default is 10.
+        cell_size (int): Size of each cell in pixels. Default is 40.
+        grid (list): 2D list representing the state of the grid. 
+            0 = empty, 1 = ship, 2 = hit, 3 = miss.
+        font (pygame.font.Font): Font used for rendering numbers and letters.
+        title_font (pygame.font.Font): Font used for rendering the title.
+        button_font (pygame.font.Font): Font used for rendering the back button.
+        player_name (str): Name of the player. Default is "Joueur".
+        enemy_name (str): Name of the enemy. Default is "Adversaire".
+        back_button (pygame.Rect): Rect object representing the back button.
+    Methods:
+        __init__(rows=10, cols=10, cell_size=40, player_name="Joueur", enemy_name="Adversaire"):
+            Initializes the Board object with the specified dimensions, cell size, and player names.
+        draw(screen):
+            Draws the grid, player names, and other game information on the screen.
+        handle_event(event):
+            Handles events for the back button. Returns "menu" if the back button is clicked.
+    """
     def __init__(self, rows=10, cols=10, cell_size=40, player_name="Joueur", enemy_name="Adversaire"):
         self.rows = rows
         self.cols = cols
@@ -16,6 +38,25 @@ class Board:
         self.back_button = None  # Back button
 
     def draw(self, screen):
+        """
+        Draws the game board, grid, and related information on the screen.
+        This method handles rendering the game interface, including the title, player names,
+        the grid with its cells, row numbers, column letters, and a back button.
+        Args:
+            screen (pygame.Surface): The surface on which to draw the game elements.
+        The following elements are drawn:
+            - A dark gray background.
+            - The game title centered at the top of the screen.
+            - Player and enemy names displayed at the top corners.
+            - A grid representing the game board, with cells color-coded based on their state:
+                - Light blue for empty cells.
+                - Green for cells containing a ship.
+                - Red for cells that have been hit.
+                - Gray for cells that have been missed.
+            - Row numbers displayed to the left of the grid.
+            - Column letters displayed above the grid.
+            - A back button at the bottom of the screen.
+        """
         """Draws the grid and game information on the screen."""
         screen.fill((30, 30, 30))  # Dark gray background
 
@@ -70,6 +111,21 @@ class Board:
         self.back_button = draw_back_button(screen, self.button_font, screen.get_width(), screen.get_height())
 
     def handle_event(self, event):
+        """
+        Handles the event for the back button.
+
+        This method checks if a mouse button down event occurs and if the 
+        back button is clicked. If the back button is clicked, it triggers 
+        a return to the main menu.
+
+        Args:
+            event (pygame.event.Event): The event to handle, typically a 
+            mouse event.
+
+        Returns:
+            str or None: Returns "menu" if the back button is clicked, 
+            otherwise returns None.
+        """
         """Handles events for the back button."""
         if event.type == pygame.MOUSEBUTTONDOWN:
             if self.back_button.collidepoint(event.pos):

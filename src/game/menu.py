@@ -2,6 +2,28 @@ import pygame
 from game.rules import Rules  # Import directly from rules.py
 
 class Menu:
+    """
+    Menu class for managing the main menu of the game.
+    Attributes:
+        screen_width (int): The width of the game screen.
+        screen_height (int): The height of the game screen.
+        font (pygame.font.Font): The font used for main menu text.
+        small_font (pygame.font.Font): The font used for smaller texts like version info.
+        show_rules (bool): A flag indicating whether the rules page is displayed.
+        rules (Rules): An instance of the Rules class for displaying game rules.
+        buttons (list): A list of dictionaries representing menu buttons with their labels, positions, and actions.
+    Methods:
+        __init__(screen_width, screen_height):
+            Initializes the Menu instance with screen dimensions and sets up fonts, rules, and buttons.
+        update_buttons():
+            Updates the dimensions and positions of the buttons based on the current screen size.
+        draw(screen):
+            Draws the main menu or the rules page on the given screen.
+        draw_main_menu(screen):
+            Draws the main menu, including the title, buttons, and version information.
+        handle_event(event):
+            Handles user input events, such as resizing the window or clicking buttons.
+    """
     def __init__(self, screen_width, screen_height):
         self.screen_width = screen_width
         self.screen_height = screen_height
@@ -12,6 +34,21 @@ class Menu:
         self.update_buttons()  # Initialize buttons
 
     def update_buttons(self):
+        """
+        Updates the dimensions and positions of the menu buttons dynamically based on the current window size.
+        This method recalculates the width, height, and position of each button to ensure they are properly
+        aligned and scaled relative to the screen dimensions. The buttons are centered horizontally and 
+        positioned vertically at specific percentages of the screen height.
+        Attributes:
+            button_width (int): The calculated width of each button, set to 25% of the screen width.
+            button_height (int): The calculated height of each button, set to 8% of the screen height.
+            button_x (int): The x-coordinate for centering the buttons horizontally.
+        Updates:
+            self.buttons (list): A list of dictionaries where each dictionary represents a button with:
+                - "label" (str): The text displayed on the button.
+                - "rect" (pygame.Rect): The rectangle defining the button's position and dimensions.
+                - "action" (str): The action associated with the button (e.g., "solo", "rules", "quit").
+        """
         """Updates the dimensions and positions of the buttons based on the window size."""
         button_width = int(self.screen_width * 0.25)
         button_height = int(self.screen_height * 0.08)
@@ -24,6 +61,17 @@ class Menu:
         ]
 
     def draw(self, screen):
+        """
+        Draws the current menu screen on the provided surface.
+
+        This method determines whether to display the main menu or the rules page
+        based on the `show_rules` attribute. If `show_rules` is True, it draws the
+        rules page using the `rules.draw` method. Otherwise, it displays the main
+        menu using the `draw_main_menu` method.
+
+        Args:
+            screen (pygame.Surface): The surface on which to draw the menu.
+        """
         """Draws the main menu or the rules page."""
         if self.show_rules:
             self.rules.draw(screen)
@@ -31,6 +79,18 @@ class Menu:
             self.draw_main_menu(screen)
 
     def draw_main_menu(self, screen):
+        """
+        Draws the main menu on the provided screen.
+        This method renders the main menu interface, including the title, buttons, 
+        and version information, onto the given Pygame screen surface.
+        Args:
+            screen (pygame.Surface): The Pygame surface where the main menu will be drawn.
+        The main menu includes:
+            - A dark gray background.
+            - A centered title "Battle Ship Royale" at the top.
+            - A list of buttons with labels, drawn with a blue background and white border.
+            - The version information displayed in the bottom-right corner.
+        """
         """Draws the main menu."""
         screen.fill((30, 30, 30))  # Dark gray background
         title = self.font.render("Battle Ship Royale", True, (255, 255, 255))
@@ -48,6 +108,16 @@ class Menu:
         screen.blit(version_text, (self.screen_width - version_text.get_width() - 10, self.screen_height - version_text.get_height() - 10))
 
     def handle_event(self, event):
+        """
+        Handles events for the menu, including window resizing, button clicks, 
+        and toggling the rules display.
+        Args:
+            event (pygame.event.Event): The event to handle.
+        Returns:
+            str or None: Returns "solo" if the solo mode button is clicked, 
+            or None if no specific action is triggered. Exits the program 
+            if the quit button is clicked.
+        """
         """Handles button clicks."""
         if event.type == pygame.VIDEORESIZE:
             # Update window size and buttons
