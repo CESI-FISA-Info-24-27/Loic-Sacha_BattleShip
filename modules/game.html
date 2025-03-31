@@ -1,0 +1,625 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Game Logic &mdash; Battle Ship Royal 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Main Application" href="main.html" />
+    <link rel="prev" title="Utilities" href="utils.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Battle Ship Royal
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="utils.html">Utilities</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Game Logic</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#game.menu.Menu"><code class="docutils literal notranslate"><span class="pre">Menu</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#game.menu.Menu.screen_height"><code class="docutils literal notranslate"><span class="pre">Menu.screen_height</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#game.menu.Menu.font"><code class="docutils literal notranslate"><span class="pre">Menu.font</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#game.menu.Menu.small_font"><code class="docutils literal notranslate"><span class="pre">Menu.small_font</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#game.menu.Menu.show_rules"><code class="docutils literal notranslate"><span class="pre">Menu.show_rules</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#game.menu.Menu.rules"><code class="docutils literal notranslate"><span class="pre">Menu.rules</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#game.menu.Menu.buttons"><code class="docutils literal notranslate"><span class="pre">Menu.buttons</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#game.menu.Menu.__init__"><code class="docutils literal notranslate"><span class="pre">Menu.__init__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#game.menu.Menu.update_buttons"><code class="docutils literal notranslate"><span class="pre">Menu.update_buttons()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#game.menu.Menu.draw"><code class="docutils literal notranslate"><span class="pre">Menu.draw()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#game.menu.Menu.draw_main_menu"><code class="docutils literal notranslate"><span class="pre">Menu.draw_main_menu()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#game.menu.Menu.handle_event"><code class="docutils literal notranslate"><span class="pre">Menu.handle_event()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id0"><code class="docutils literal notranslate"><span class="pre">Menu.draw()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id1"><code class="docutils literal notranslate"><span class="pre">Menu.draw_main_menu()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id2"><code class="docutils literal notranslate"><span class="pre">Menu.handle_event()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id3"><code class="docutils literal notranslate"><span class="pre">Menu.update_buttons()</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#game.menu.Menu.button_height"><code class="docutils literal notranslate"><span class="pre">Menu.button_height</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#game.menu.Menu.button_x"><code class="docutils literal notranslate"><span class="pre">Menu.button_x</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#game.rules.Rules"><code class="docutils literal notranslate"><span class="pre">Rules</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#game.rules.Rules.screen_height"><code class="docutils literal notranslate"><span class="pre">Rules.screen_height</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#game.rules.Rules.font"><code class="docutils literal notranslate"><span class="pre">Rules.font</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#game.rules.Rules.small_font"><code class="docutils literal notranslate"><span class="pre">Rules.small_font</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#game.rules.Rules.back_button"><code class="docutils literal notranslate"><span class="pre">Rules.back_button</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#game.rules.Rules.__init__"><code class="docutils literal notranslate"><span class="pre">Rules.__init__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#game.rules.Rules.draw"><code class="docutils literal notranslate"><span class="pre">Rules.draw()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#game.rules.Rules.handle_event"><code class="docutils literal notranslate"><span class="pre">Rules.handle_event()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id4"><code class="docutils literal notranslate"><span class="pre">Rules.draw()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id5"><code class="docutils literal notranslate"><span class="pre">Rules.handle_event()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#game.button.draw_back_button"><code class="docutils literal notranslate"><span class="pre">draw_back_button()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#game.player.Player"><code class="docutils literal notranslate"><span class="pre">Player</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#game.player.Player.name"><code class="docutils literal notranslate"><span class="pre">Player.name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#game.player.Player.is_enemy"><code class="docutils literal notranslate"><span class="pre">Player.is_enemy</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#game.player.Player.boats"><code class="docutils literal notranslate"><span class="pre">Player.boats</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#game.player.Player.move_historic"><code class="docutils literal notranslate"><span class="pre">Player.move_historic</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#game.player.Player.change_name"><code class="docutils literal notranslate"><span class="pre">Player.change_name()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#game.player.Player.record_move"><code class="docutils literal notranslate"><span class="pre">Player.record_move()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#game.player.Player.set_boat_emplacement"><code class="docutils literal notranslate"><span class="pre">Player.set_boat_emplacement()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#game.action.Action"><code class="docutils literal notranslate"><span class="pre">Action</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#game.action.Action.shoot"><code class="docutils literal notranslate"><span class="pre">Action.shoot()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="main.html">Main Application</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Battle Ship Royal</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Game Logic</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/modules/game.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-game.menu">
+<span id="game-logic"></span><h1>Game Logic<a class="headerlink" href="#module-game.menu" title="Link to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="game.menu.Menu">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">game.menu.</span></span><span class="sig-name descname"><span class="pre">Menu</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">screen_width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">screen_height</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#game.menu.Menu" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Menu class for managing the main menu of the game.
+.. attribute:: screen_width</p>
+<blockquote>
+<div><p>The width of the game screen.</p>
+<dl class="field-list simple">
+<dt class="field-odd">type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="game.menu.Menu.screen_height">
+<span class="sig-name descname"><span class="pre">screen_height</span></span><a class="headerlink" href="#game.menu.Menu.screen_height" title="Link to this definition">¶</a></dt>
+<dd><p>The height of the game screen.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="game.menu.Menu.font">
+<span class="sig-name descname"><span class="pre">font</span></span><a class="headerlink" href="#game.menu.Menu.font" title="Link to this definition">¶</a></dt>
+<dd><p>The font used for main menu text.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pygame.font.Font</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="game.menu.Menu.small_font">
+<span class="sig-name descname"><span class="pre">small_font</span></span><a class="headerlink" href="#game.menu.Menu.small_font" title="Link to this definition">¶</a></dt>
+<dd><p>The font used for smaller texts like version info.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pygame.font.Font</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="game.menu.Menu.show_rules">
+<span class="sig-name descname"><span class="pre">show_rules</span></span><a class="headerlink" href="#game.menu.Menu.show_rules" title="Link to this definition">¶</a></dt>
+<dd><p>A flag indicating whether the rules page is displayed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="game.menu.Menu.rules">
+<span class="sig-name descname"><span class="pre">rules</span></span><a class="headerlink" href="#game.menu.Menu.rules" title="Link to this definition">¶</a></dt>
+<dd><p>An instance of the Rules class for displaying game rules.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#game.rules.Rules" title="game.rules.Rules">Rules</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="game.menu.Menu.buttons">
+<span class="sig-name descname"><span class="pre">buttons</span></span><a class="headerlink" href="#game.menu.Menu.buttons" title="Link to this definition">¶</a></dt>
+<dd><p>A list of dictionaries representing menu buttons with their labels, positions, and actions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="game.menu.Menu.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">screen_width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">screen_height</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#game.menu.Menu.__init__" title="Link to this definition">¶</a></dt>
+<dd><p>Initializes the Menu instance with screen dimensions and sets up fonts, rules, and buttons.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="game.menu.Menu.update_buttons">
+<span class="sig-name descname"><span class="pre">update_buttons</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#game.menu.Menu.update_buttons" title="Link to this definition">¶</a></dt>
+<dd><p>Updates the dimensions and positions of the buttons based on the current screen size.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="game.menu.Menu.draw">
+<span class="sig-name descname"><span class="pre">draw</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">screen</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#game.menu.Menu.draw" title="Link to this definition">¶</a></dt>
+<dd><p>Draws the main menu or the rules page on the given screen.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="game.menu.Menu.draw_main_menu">
+<span class="sig-name descname"><span class="pre">draw_main_menu</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">screen</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#game.menu.Menu.draw_main_menu" title="Link to this definition">¶</a></dt>
+<dd><p>Draws the main menu, including the title, buttons, and version information.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="game.menu.Menu.handle_event">
+<span class="sig-name descname"><span class="pre">handle_event</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#game.menu.Menu.handle_event" title="Link to this definition">¶</a></dt>
+<dd><p>Handles user input events, such as resizing the window or clicking buttons.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id0">
+<span class="sig-name descname"><span class="pre">draw</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">screen</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id0" title="Link to this definition">¶</a></dt>
+<dd><p>Draws the current menu screen on the provided surface.</p>
+<p>This method determines whether to display the main menu or the rules page
+based on the <cite>show_rules</cite> attribute. If <cite>show_rules</cite> is True, it draws the
+rules page using the <cite>rules.draw</cite> method. Otherwise, it displays the main
+menu using the <cite>draw_main_menu</cite> method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>screen</strong> (<em>pygame.Surface</em>) – The surface on which to draw the menu.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id1">
+<span class="sig-name descname"><span class="pre">draw_main_menu</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">screen</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id1" title="Link to this definition">¶</a></dt>
+<dd><p>Draws the main menu on the provided screen.
+This method renders the main menu interface, including the title, buttons,
+and version information, onto the given Pygame screen surface.
+:param screen: The Pygame surface where the main menu will be drawn.
+:type screen: pygame.Surface</p>
+<dl class="simple">
+<dt>The main menu includes:</dt><dd><ul class="simple">
+<li><p>A dark gray background.</p></li>
+<li><p>A centered title “Battle Ship Royale” at the top.</p></li>
+<li><p>A list of buttons with labels, drawn with a blue background and white border.</p></li>
+<li><p>The version information displayed in the bottom-right corner.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id2">
+<span class="sig-name descname"><span class="pre">handle_event</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id2" title="Link to this definition">¶</a></dt>
+<dd><p>Handles events for the menu, including window resizing, button clicks,
+and toggling the rules display.
+:param event: The event to handle.
+:type event: pygame.event.Event</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Returns “solo” if the solo mode button is clicked,
+or None if no specific action is triggered. Exits the program
+if the quit button is clicked.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id3">
+<span class="sig-name descname"><span class="pre">update_buttons</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#id3" title="Link to this definition">¶</a></dt>
+<dd><p>Updates the dimensions and positions of the menu buttons dynamically based on the current window size.
+This method recalculates the width, height, and position of each button to ensure they are properly
+aligned and scaled relative to the screen dimensions. The buttons are centered horizontally and
+positioned vertically at specific percentages of the screen height.
+.. attribute:: button_width</p>
+<blockquote>
+<div><p>The calculated width of each button, set to 25% of the screen width.</p>
+<dl class="field-list simple">
+<dt class="field-odd">type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="game.menu.Menu.button_height">
+<span class="sig-name descname"><span class="pre">button_height</span></span><a class="headerlink" href="#game.menu.Menu.button_height" title="Link to this definition">¶</a></dt>
+<dd><p>The calculated height of each button, set to 8% of the screen height.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="game.menu.Menu.button_x">
+<span class="sig-name descname"><span class="pre">button_x</span></span><a class="headerlink" href="#game.menu.Menu.button_x" title="Link to this definition">¶</a></dt>
+<dd><p>The x-coordinate for centering the buttons horizontally.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="simple">
+<dt>Updates:</dt><dd><dl class="simple">
+<dt>self.buttons (list): A list of dictionaries where each dictionary represents a button with:</dt><dd><ul class="simple">
+<li><p>“label” (str): The text displayed on the button.</p></li>
+<li><p>“rect” (pygame.Rect): The rectangle defining the button’s position and dimensions.</p></li>
+<li><p>“action” (str): The action associated with the button (e.g., “solo”, “rules”, “quit”).</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class" id="module-game.rules">
+<dt class="sig sig-object py" id="game.rules.Rules">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">game.rules.</span></span><span class="sig-name descname"><span class="pre">Rules</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">screen_width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">screen_height</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#game.rules.Rules" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>The <cite>Rules</cite> class represents the rules page of the Battleship game. It is responsible for
+displaying the rules and handling user interactions on this page.
+.. attribute:: screen_width</p>
+<blockquote>
+<div><p>The width of the game screen.</p>
+<dl class="field-list simple">
+<dt class="field-odd">type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="game.rules.Rules.screen_height">
+<span class="sig-name descname"><span class="pre">screen_height</span></span><a class="headerlink" href="#game.rules.Rules.screen_height" title="Link to this definition">¶</a></dt>
+<dd><p>The height of the game screen.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="game.rules.Rules.font">
+<span class="sig-name descname"><span class="pre">font</span></span><a class="headerlink" href="#game.rules.Rules.font" title="Link to this definition">¶</a></dt>
+<dd><p>Font used for the title text.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pygame.font.Font</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="game.rules.Rules.small_font">
+<span class="sig-name descname"><span class="pre">small_font</span></span><a class="headerlink" href="#game.rules.Rules.small_font" title="Link to this definition">¶</a></dt>
+<dd><p>Font used for the rules text.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pygame.font.Font</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="game.rules.Rules.back_button">
+<span class="sig-name descname"><span class="pre">back_button</span></span><a class="headerlink" href="#game.rules.Rules.back_button" title="Link to this definition">¶</a></dt>
+<dd><p>The back button rectangle, initialized as None.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pygame.Rect or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="game.rules.Rules.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">screen_width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">screen_height</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#game.rules.Rules.__init__" title="Link to this definition">¶</a></dt>
+<dd><p>Initializes the <cite>Rules</cite> class with screen dimensions and fonts.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="game.rules.Rules.draw">
+<span class="sig-name descname"><span class="pre">draw</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">screen</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#game.rules.Rules.draw" title="Link to this definition">¶</a></dt>
+<dd><p>Draws the rules page, including the title, rules text, and back button.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="game.rules.Rules.handle_event">
+<span class="sig-name descname"><span class="pre">handle_event</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#game.rules.Rules.handle_event" title="Link to this definition">¶</a></dt>
+<dd><p>Handles user interactions, specifically detecting clicks on the back button.
+:param event: The event to handle.
+:type event: pygame.event.Event</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Returns “menu” if the back button is clicked, otherwise None.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id4">
+<span class="sig-name descname"><span class="pre">draw</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">screen</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id4" title="Link to this definition">¶</a></dt>
+<dd><p>Draws the rules page.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id5">
+<span class="sig-name descname"><span class="pre">handle_event</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id5" title="Link to this definition">¶</a></dt>
+<dd><p>Handles the event for the back button.</p>
+<p>This method checks if a mouse button down event occurs and if the
+back button is clicked. If the back button is clicked, it returns
+a string indicating a transition to the main menu.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>event</strong> (<em>pygame.event.Event</em>) – The event to handle, typically a</p></li>
+<li><p><strong>event.</strong> (<em>mouse</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Returns “menu” if the back button is clicked,
+otherwise returns None.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function" id="module-game.button">
+<dt class="sig sig-object py" id="game.button.draw_back_button">
+<span class="sig-prename descclassname"><span class="pre">game.button.</span></span><span class="sig-name descname"><span class="pre">draw_back_button</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">screen</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">font</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">screen_width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">screen_height</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Retour'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#game.button.draw_back_button" title="Link to this definition">¶</a></dt>
+<dd><p>Draws a “Back” button centered at the bottom of the screen.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>screen</strong> (<em>pygame.Surface</em>) – Surface on which to draw the button.</p></li>
+<li><p><strong>font</strong> (<em>pygame.font.Font</em>) – Font used for the text.</p></li>
+<li><p><strong>screen_width</strong> (<em>int</em>) – Width of the screen.</p></li>
+<li><p><strong>screen_height</strong> (<em>int</em>) – Height of the screen.</p></li>
+<li><p><strong>text</strong> (<em>str</em>) – Text displayed on the button (default: “Retour”).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Rectangle representing the button (useful for detecting clicks).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pygame.Rect</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class" id="module-game.player">
+<dt class="sig sig-object py" id="game.player.Player">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">game.player.</span></span><span class="sig-name descname"><span class="pre">Player</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#game.player.Player" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Représente un joueur dans le jeu de bataille navale.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="game.player.Player.name">
+<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#game.player.Player.name" title="Link to this definition">¶</a></dt>
+<dd><p>Le nom du joueur.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="game.player.Player.is_enemy">
+<span class="sig-name descname"><span class="pre">is_enemy</span></span><a class="headerlink" href="#game.player.Player.is_enemy" title="Link to this definition">¶</a></dt>
+<dd><p>Indique si le joueur est un ennemi.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="game.player.Player.boats">
+<span class="sig-name descname"><span class="pre">boats</span></span><a class="headerlink" href="#game.player.Player.boats" title="Link to this definition">¶</a></dt>
+<dd><p>Un dictionnaire contenant les bateaux et leurs emplacements.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="game.player.Player.move_historic">
+<span class="sig-name descname"><span class="pre">move_historic</span></span><a class="headerlink" href="#game.player.Player.move_historic" title="Link to this definition">¶</a></dt>
+<dd><p>Une liste des mouvements effectués par le joueur.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="game.player.Player.change_name">
+<span class="sig-name descname"><span class="pre">change_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#game.player.Player.change_name" title="Link to this definition">¶</a></dt>
+<dd><p>Change le nom du joueur.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>name</strong> (<em>str</em>) – Le nouveau nom du joueur.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="game.player.Player.record_move">
+<span class="sig-name descname"><span class="pre">record_move</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hit</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#game.player.Player.record_move" title="Link to this definition">¶</a></dt>
+<dd><p>Enregistre un mouvement effectué par le joueur.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>int</em>) – La position X du mouvement.</p></li>
+<li><p><strong>Y</strong> (<em>int</em>) – La position Y du mouvement.</p></li>
+<li><p><strong>hit</strong> (<em>bool</em>) – Indique si le mouvement a touché un bateau.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="game.player.Player.set_boat_emplacement">
+<span class="sig-name descname"><span class="pre">set_boat_emplacement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">boat_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#game.player.Player.set_boat_emplacement" title="Link to this definition">¶</a></dt>
+<dd><p>Définit l’emplacement d’un bateau sur la grille.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>boat_name</strong> (<em>str</em>) – Le nom du bateau.</p></li>
+<li><p><strong>X</strong> (<em>int</em>) – La position X sur la grille (entre 1 et 10).</p></li>
+<li><p><strong>Y</strong> (<em>int</em>) – La position Y sur la grille (entre 1 et 10).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – Si les coordonnées (X, Y) sont hors limites ou déjà attribuées.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class" id="module-game.action">
+<dt class="sig sig-object py" id="game.action.Action">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">game.action.</span></span><span class="sig-name descname"><span class="pre">Action</span></span><a class="headerlink" href="#game.action.Action" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class containing static methods for performing game actions in the Battleship game.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="game.action.Action.shoot">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">shoot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">player</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enemy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#game.action.Action.shoot" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="utils.html" class="btn btn-neutral float-left" title="Utilities" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="main.html" class="btn btn-neutral float-right" title="Main Application" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Sacha COLBERT-LISBONA, Loïc SERRE.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
