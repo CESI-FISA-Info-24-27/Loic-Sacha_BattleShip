@@ -54,7 +54,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: 3.13.2
+          python-version: 3.10  # Utilisez une version valide comme 3.10
 
       # Install dependencies
       - name: Install dependencies
@@ -69,7 +69,7 @@ jobs:
       - name: Build Sphinx Documentation
         run: |
           source .venv/bin/activate
-          cd docs
+          cd source  # Utilisez le répertoire `source` au lieu de `docs`
           make html
 
       # Deploy to GitHub Pages
@@ -77,4 +77,4 @@ jobs:
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: docs/_build/html
+          publish_dir: source/build/html  # Chemin correct pour les fichiers générés
