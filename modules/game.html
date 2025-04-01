@@ -79,6 +79,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#game.button.draw_back_button"><code class="docutils literal notranslate"><span class="pre">draw_back_button()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#game.button.reinit_button"><code class="docutils literal notranslate"><span class="pre">reinit_button()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#game.player.Player"><code class="docutils literal notranslate"><span class="pre">Player</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#game.player.Player.name"><code class="docutils literal notranslate"><span class="pre">Player.name</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#game.player.Player.is_enemy"><code class="docutils literal notranslate"><span class="pre">Player.is_enemy</span></code></a></li>
@@ -471,6 +472,30 @@ otherwise returns None.</p>
 <li><p><strong>screen_width</strong> (<em>int</em>) – Width of the screen.</p></li>
 <li><p><strong>screen_height</strong> (<em>int</em>) – Height of the screen.</p></li>
 <li><p><strong>text</strong> (<em>str</em>) – Text displayed on the button (default: “Retour”).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Rectangle representing the button (useful for detecting clicks).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pygame.Rect</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="game.button.reinit_button">
+<span class="sig-prename descclassname"><span class="pre">game.button.</span></span><span class="sig-name descname"><span class="pre">reinit_button</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">screen</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">font</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">screen_width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">screen_height</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Réinitialiser</span> <span class="pre">la</span> <span class="pre">partie'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#game.button.reinit_button" title="Link to this definition">¶</a></dt>
+<dd><p>Draws a button centered at the bottom of the screen.
+This button allow the player to start again the game.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>screen</strong> (<em>pygame.Surface</em>) – Surface on which to draw the button.</p></li>
+<li><p><strong>font</strong> (<em>pygame.font.Font</em>) – Font used for the text.</p></li>
+<li><p><strong>screen_width</strong> (<em>int</em>) – Width of the screen.</p></li>
+<li><p><strong>screen_height</strong> (<em>int</em>) – Height of the screen.</p></li>
+<li><p><strong>text</strong> (<em>str</em>) – Text displayed on the button (default: “Réinitialiser la partie”).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
