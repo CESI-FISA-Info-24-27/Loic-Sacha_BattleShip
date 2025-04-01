@@ -63,7 +63,7 @@ class Board:
         self.rows = rows
         self.cols = cols
         self.cell_size = cell_size
-        self.grid = [[0 for _ in range(cols)] for _ in range(rows)]  # 0 = empty, 1 = ship, 2 = hit, 3 = miss
+        self.grid = [[{"player_hit": False, "ai_hit": False, "ship": False} for _ in range(cols)] for _ in range(rows)]  # 0 = empty, 1 = ship, 2 = hit, 3 = miss
         self.font = pygame.font.SysFont(None, 24)  # Font for numbers and letters
         self.order_font = pygame.font.SysFont(None, 20)
         self.title_font = pygame.font.SysFont(None, 48)  # Font for the title
@@ -191,6 +191,14 @@ class Board:
             x_pos = screen.get_width() * (7/8) - order_text.get_width() * 0.5
             screen.blit(order_text, (x_pos, y_pos))
             y_pos += order_text.get_height() + 5
+        
+        historic = self.player.move_historic
+
+        for line in historic:
+            historic_text = self.order_font.render(line, True, (255, 255, 255))
+            x_pos = screen.get_width() * (1/8) - historic_text.get_width() * 0.5
+            screen.blit(historic_text, (x_pos, y_pos))
+            y_pos += historic_text.get_height() + 5
 
 
         # Display the current boat being placed or completion message
@@ -218,17 +226,36 @@ class Board:
                 y = margin_y + row * self.cell_size
                 rect = pygame.Rect(x, y, self.cell_size, self.cell_size)
 
-                # Cell color based on its state
-                if self.grid[row][col] == 0:  # Empty
-                    color = (173, 216, 230)  # Light blue
-                elif self.grid[row][col] == 1:  # Ship
-                    color = (0, 128, 0)  # Green
-                elif self.grid[row][col] == 2:  # Hit
-                    color = (255, 0, 0)  # Red
-                elif self.grid[row][col] == 3:  # Miss
-                    color = (169, 169, 169)  # Gray
+                # Draw the background color
+                if self.grid[row][col]["ship"]:
+                    pygame.draw.rect(screen, (0, 128, 255), rect)  # Blue for ship
+                else:
+                    pygame.draw.rect(screen, (173, 216, 230), rect)  # Light blue for empty
 
-                pygame.draw.rect(screen, color, rect)  # Fill the cell
+                # Draw a cross if the player hit this cell
+                if self.grid[row][col]["player_hit"]:
+                    if self.grid[row][col]["ship"]:
+                        # Check if the ship belongs to the enemy or the player
+                        if any((row, col) in positions for positions in self.enemy.boats.values()):
+                            line_color = (255, 0, 0)  # Red for hitting an enemy ship
+                        else:
+                            line_color = (255, 255, 255)  # White for hitting own ship
+                    else:
+                        line_color = (255, 255, 255)  # White for a miss
+                    pygame.draw.line(screen, line_color, (x, y), (x + self.cell_size, y + self.cell_size), 3)  # Diagonal \
+                    pygame.draw.line(screen, line_color, (x, y + self.cell_size), (x + self.cell_size, y), 3)  # Diagonal /
+
+                # Draw a circle if the AI hit this cell
+                if self.grid[row][col]["ai_hit"]:
+                    if self.grid[row][col]["ship"]:
+                        circle_color = (255, 0, 0)  # Red for a hit
+                    else:
+                        circle_color = (255, 255, 255)  # White for a miss
+                    center = (x + self.cell_size // 2, y + self.cell_size // 2)
+                    radius = self.cell_size // 4
+                    pygame.draw.circle(screen, circle_color, center, radius, 3)
+
+                # Draw the cell border
                 pygame.draw.rect(screen, (0, 0, 0), rect, 1)  # Black border
 
         # Draw row numbers (on the left)
@@ -306,16 +333,16 @@ class Board:
         
         # List of boats with their sizes
         boats = [
-            {"type": BoatType.AIRCRAFT_CARRIER, "size": 5},  # 1 boat of size 5
-            {"type": BoatType.CRUISER, "size": 4},           # 1 boat of size 4
-            {"type": BoatType.DESTROYER, "size": 3},         # 1st boat of size 3
-            {"type": BoatType.SUBMARINE, "size": 3},         # 2nd boat of size 3
-            {"type": BoatType.TORPEDO, "size": 2},           # 1 boat of size 2
-        ]
-                    
+        {"type": BoatType.AIRCRAFT_CARRIER, "size": 5},  # 1 bateau de taille 5
+        {"type": BoatType.CRUISER, "size": 4},           # 1 bateau de taille 4
+        {"type": BoatType.DESTROYER, "size": 3},         # 1er bateau de taille 3
+        {"type": BoatType.SUBMARINE, "size": 3},         # 2e bateau de taille 3
+        {"type": BoatType.TORPEDO, "size": 2},           # 1 bateau de taille 2
+    ]
+
         if not hasattr(self, "placement_complete") or not self.placement_complete:
             if event.type == pygame.MOUSEBUTTONDOWN:
-                # Calculate the position of the click in the grid
+                # Calculer la position du clic dans la grille
                 grid_width = self.cols * self.cell_size
                 grid_height = self.rows * self.cell_size
                 margin_x = (pygame.display.get_surface().get_width() - grid_width) // 2
@@ -326,55 +353,61 @@ class Board:
                 row = (y - margin_y) // self.cell_size
 
                 if 0 <= col < self.cols and 0 <= row < self.rows:
-                    
-                    # Check if a boat is currently being placed
+                    # Vérifiez si un bateau est en cours de placement
                     if not hasattr(self, "current_boat_index"):
-                        self.current_boat_index = 0  # Index of the boat to place
-                        self.current_boat = {"name": boats[self.current_boat_index]["type"].value, "positions": [], "size": boats[self.current_boat_index]["size"]}
+                        self.current_boat_index = 0  # Index du bateau à placer
+                        self.current_boat = {
+                            "name": boats[self.current_boat_index]["type"].value,
+                            "positions": [],
+                            "size": boats[self.current_boat_index]["size"]
+                        }
 
-                    # Add the position if it is valid
+                    # Ajouter la position si elle est valide
                     if len(self.current_boat["positions"]) == 0:
-                        # First position
+                        # Première position
                         self.current_boat["positions"].append((row, col))
-                        self.grid[row][col] = 1
+                        self.grid[row][col]["ship"] = True
                     else:
-                        # Check that the position is aligned with the previous ones
+                        # Vérifiez que la position est alignée avec les précédentes
                         first_row, first_col = self.current_boat["positions"][0]
                         if (row == first_row or col == first_col) and (row, col) not in self.current_boat["positions"]:
-                            # Check that there is no overlap
-                            for r, c in self.current_boat["positions"]:
-                                if self.grid[row][col] != 0:
-                                    return
+                            # Vérifiez qu'il n'y a pas de chevauchement
+                            if self.grid[row][col]["ship"]:
+                                return
 
-                            # Check that all positions are continuous
+                            # Vérifiez que toutes les positions sont continues
                             if not self.is_continuous(self.current_boat["positions"], (row, col)):
                                 return
 
-                            # Add the position
+                            # Ajouter la position
                             self.current_boat["positions"].append((row, col))
-                            self.grid[row][col] = 1
+                            self.grid[row][col]["ship"] = True
 
-                    # Check if the boat is completely placed
+                    # Vérifiez si le bateau est complètement placé
                     if len(self.current_boat["positions"]) == self.current_boat["size"]:
-                        # Add each position of the boat
+                        # Enregistrez chaque position du bateau
                         for position in self.current_boat["positions"]:
                             player.set_boat_emplacement(self.current_boat["name"], position[0], position[1])
 
-                        self.current_boat_index += 1  # Move to the next boat
+                        self.current_boat_index += 1  # Passez au bateau suivant
 
-                        # Check if there are more boats to place
+                        # Vérifiez s'il reste des bateaux à placer
                         if self.current_boat_index < len(boats):
-                            self.current_boat = {"name": boats[self.current_boat_index]["type"].value, "positions": [], "size": boats[self.current_boat_index]["size"]}
+                            self.current_boat = {
+                                "name": boats[self.current_boat_index]["type"].value,
+                                "positions": [],
+                                "size": boats[self.current_boat_index]["size"]
+                            }
                         else:
-                            # All boats have been placed
+                            # Tous les bateaux ont été placés
                             del self.current_boat
                             del self.current_boat_index
                             self.placement_complete = True  # Mark placement as complete
 
-        # Display the boat currently being placed
-        if not hasattr(self, "current_boat_index"):
-            self.current_boat_index = 0  # Index du bateau à placer
-            self.current_boat = {"name": boats[self.current_boat_index]["type"].value, "positions": [], "size": boats[self.current_boat_index]["size"]}
+            # Display the boat currently being placed
+            if not hasattr(self, "current_boat_index"):
+                self.current_boat_index = 0  # Index du bateau à placer
+                self.current_boat = {"name": boats[self.current_boat_index]["type"].value, "positions": [], "size": boats[self.current_boat_index]["size"]}
 
     def is_continuous(self, positions, new_position):
         """
@@ -392,10 +425,10 @@ class Board:
         rows = [pos[0] for pos in all_positions]
         cols = [pos[1] for pos in all_positions]
 
-        # Check if all positions are on the same row or the same column
-        if len(set(rows)) == 1:  # Same row
+        # Vérifiez si toutes les positions sont sur la même ligne ou la même colonne
+        if len(set(rows)) == 1:  # Même ligne
             return sorted(cols) == list(range(min(cols), max(cols) + 1))
-        elif len(set(cols)) == 1:  # Same column
+        elif len(set(cols)) == 1:  # Même colonne
             return sorted(rows) == list(range(min(rows), max(rows) + 1))
         return False
     
@@ -431,7 +464,6 @@ class Board:
         if self.player_turn:
             # Player's turn
             if event.type == pygame.MOUSEBUTTONDOWN:
-                # Calculate the position of the click in the enemy grid
                 grid_width = self.cols * self.cell_size
                 grid_height = self.rows * self.cell_size
                 margin_x = (pygame.display.get_surface().get_width() - grid_width) // 2
@@ -442,52 +474,45 @@ class Board:
                 row = (y - margin_y) // self.cell_size
 
                 if 0 <= col < self.cols and 0 <= row < self.rows:
-                    # Check if the cell has already been targeted
-                    if self.grid[row][col] in [2, 3]:
+                    cell = self.grid[row][col]
+
+                    # Check if the player has already hit this cell
+                    if cell["player_hit"]:
                         print("You have already targeted this cell.")
                         return
 
                     # Check if an enemy ship is hit
-                    hit = False
-                    for boat_positions in self.enemy.boats.values():
-                        if (row, col) in boat_positions:
-                            hit = True
-                            boat_positions.remove((row, col))  # Remove the hit position
-                            self.grid[row][col] = 2  # Mark as hit
-                            break
-
-                    if not hit:
-                        self.grid[row][col] = 3  # Mark as missed
+                    if cell["ship"]:
+                        print(f"Player hit an enemy ship at ({row}, {col})!")
+                        cell["player_hit"] = True
+                    else:
+                        print(f"Player missed at ({row}, {col}).")
+                        cell["player_hit"] = True
 
                     # Switch to the AI's turn
                     self.player_turn = False
 
         else:
-            # Tour de l'IA
-            print("Tour de l'IA...")
+            # AI's turn
+            print("AI's turn...")
             while True:
                 row = random.randint(0, self.rows - 1)
                 col = random.randint(0, self.cols - 1)
+                cell = self.grid[row][col]
 
-                # Vérifier si la case a déjà été tirée
-                if self.grid[row][col] in [2, 3]:
+                # Check if the AI has already hit this cell
+                if cell["ai_hit"]:
                     continue
 
-                # Vérifier si un bateau du joueur est touché
-                hit = False
-                for boat_positions in self.player.boats.values():
-                    if (row, col) in boat_positions:
-                        hit = True
-                        boat_positions.remove((row, col))  # Retirer la position touchée
-                        self.grid[row][col] = 2  # Marquer comme touché
-                        print(f"L'IA a touché votre bateau à ({row}, {col}) !")
-                        break
+                # Check if a player's ship is hit
+                if cell["ship"]:
+                    print(f"The AI hit your ship at ({row}, {col})!")
+                    cell["ai_hit"] = True
+                else:
+                    print(f"The AI missed at ({row}, {col}).")
+                    cell["ai_hit"] = True
 
-                if not hit:
-                    self.grid[row][col] = 3  # Marquer comme raté
-                    print(f"L'IA a raté à ({row}, {col}).")
-
-                # Passer au tour du joueur
+                # Switch to the player's turn
                 self.player_turn = True
                 break
     
@@ -508,7 +533,7 @@ class Board:
         return None
     
     def reset_grid(self):
-        self.grid = [[0 for _ in range(self.cols)] for _ in range(self.rows)]
+        self.grid = [[{"player_hit": False, "ai_hit": False, "ship": False} for _ in range(self.cols)] for _ in range(self.rows)]
         self.player.boats = {}
         self.enemy.boats = {}
         self.placement_complete = False
