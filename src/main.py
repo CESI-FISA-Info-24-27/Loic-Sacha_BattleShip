@@ -21,7 +21,7 @@ def main():
       appropriate methods (`handle_event` and `draw`) to manage their respective functionalities.
     """
     pygame.init()
-    screen_width, screen_height = 800, 800
+    screen_width, screen_height = 1200, 800
     screen = pygame.display.set_mode((screen_width, screen_height), pygame.RESIZABLE)
     pygame.display.set_caption("Battle Ship Royale")
 

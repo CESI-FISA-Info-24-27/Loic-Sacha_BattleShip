@@ -65,6 +65,7 @@ class Board:
         self.cell_size = cell_size
         self.grid = [[0 for _ in range(cols)] for _ in range(rows)]  # 0 = empty, 1 = ship, 2 = hit, 3 = miss
         self.font = pygame.font.SysFont(None, 24)  # Font for numbers and letters
+        self.order_font = pygame.font.SysFont(None, 20)
         self.title_font = pygame.font.SysFont(None, 48)  # Font for the title
         self.select_font = pygame.font.SysFont(None, 40)
         self.button_font = pygame.font.SysFont(None, 30)  # Font for the button
@@ -172,6 +173,24 @@ class Board:
         enemy_text = self.font.render(f"Enemy: {self.enemy.name}", True, (255, 255, 255))
         screen.blit(player_text, (10, 60))
         screen.blit(enemy_text, (screen.get_width() - enemy_text.get_width() - 10, 60))
+        order_lines = [
+            "Ordre :",
+            "",
+            "Aircraft Carrier (taille : 5)",
+            "Cruiser (taille : 4)",
+            "Destroyer (taille : 3)",
+            "Submarine (taille : 3)",
+            "Torpedo (taille : 2)"
+        ]
+
+        y_pos = screen.get_height() * 0.5
+
+        for line in order_lines:
+            order_text = self.order_font.render(line, True, (255, 255, 255))
+            x_pos = screen.get_width() * (7/8) - order_text.get_width() * 0.5
+            screen.blit(order_text, (x_pos, y_pos))
+            y_pos += order_text.get_height() + 5
+
 
         # Display the current boat being placed or completion message
         if hasattr(self, "placement_complete") and self.placement_complete:
