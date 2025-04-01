@@ -1,7 +1,7 @@
 import pygame
 import string
 from game.button import draw_back_button  # Import directly from button.py
-from game.player import Player
+from game.button import reinit_button
 from utils.boat_type import BoatType 
 import random
 
@@ -70,6 +70,7 @@ class Board:
         self.select_font = pygame.font.SysFont(None, 40)
         self.button_font = pygame.font.SysFont(None, 30)  # Font for the button
         self.back_button = None  # Back button
+        self.reinit_button = None
 
         # Assign player and enemy
         self.player = player
@@ -242,6 +243,7 @@ class Board:
             screen.blit(text, (margin_x + col * self.cell_size + self.cell_size // 4, margin_y - 20))
 
         # Draw the back button
+        self.reinit_button = reinit_button(screen, self.order_font, screen.get_width(), screen.get_height() - 50)
         self.back_button = draw_back_button(screen, self.button_font, screen.get_width(), screen.get_height())
 
     def handle_event(self, event):
@@ -260,6 +262,9 @@ class Board:
         if event.type == pygame.MOUSEBUTTONDOWN:
             if self.back_button.collidepoint(event.pos):
                 return "menu"  # Return to the main menu
+            
+            if self.reinit_button.collidepoint(event.pos):
+                self.reset_grid()
 
             # If the boat placement is complete, start the game
             if self.placement_complete:
@@ -501,3 +506,14 @@ class Board:
         if all(len(positions) == 0 for positions in self.player.boats.values()):
             return "ia"
         return None
+    
+    def reset_grid(self):
+        self.grid = [[0 for _ in range(self.cols)] for _ in range(self.rows)]
+        self.player.boats = {}
+        self.enemy.boats = {}
+        self.placement_complete = False
+        if hasattr(self, "current_boat"):
+            del self.current_boat
+        if hasattr(self, "current_boat_index"):
+            del self.current_boat_index  
+        print("Grille réinitialisée !")
