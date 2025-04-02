@@ -78,6 +78,7 @@ class Board:
 
         # Initialize the placement_complete attribute
         self.placement_complete = False  # Indicates whether all boats have been placed
+        self.first_shot = True
 
         # Generate the enemy's grid if it does not already exist
         if self.enemy and not self.enemy.boats:
@@ -202,10 +203,10 @@ class Board:
 
 
         # Display the current boat being placed or completion message
-        if hasattr(self, "placement_complete") and self.placement_complete:
+        if hasattr(self, "placement_complete") and self.placement_complete and self.first_shot:
             completion_message = self.select_font.render("Tous les bateaux ont été placés !", True, (0, 255, 0))
             screen.blit(completion_message, (screen.get_width() // 2 - completion_message.get_width() // 2, 110))
-        elif hasattr(self, "current_boat"):
+        elif hasattr(self, "current_boat") and not self.placement_complete:
             boat_info = self.select_font.render(
                 f"Placer le bateau : {self.current_boat['name']} (taille : {self.current_boat['size']})",
                 True,
@@ -234,14 +235,7 @@ class Board:
 
                 # Draw a cross if the player hit this cell
                 if self.grid[row][col]["player_hit"]:
-                    if self.grid[row][col]["ship"]:
-                        # Check if the ship belongs to the enemy or the player
-                        if any((row, col) in positions for positions in self.enemy.boats.values()):
-                            line_color = (255, 0, 0)  # Red for hitting an enemy ship
-                        else:
-                            line_color = (255, 255, 255)  # White for hitting own ship
-                    else:
-                        line_color = (255, 255, 255)  # White for a miss
+                    line_color = self.grid[row][col].get("hit_color", (255, 255, 255))  # Default to white
                     pygame.draw.line(screen, line_color, (x, y), (x + self.cell_size, y + self.cell_size), 3)  # Diagonal \
                     pygame.draw.line(screen, line_color, (x, y + self.cell_size), (x + self.cell_size, y), 3)  # Diagonal /
 
@@ -464,6 +458,7 @@ class Board:
         if self.player_turn:
             # Player's turn
             if event.type == pygame.MOUSEBUTTONDOWN:
+                # Calculer la position du clic dans la grille
                 grid_width = self.cols * self.cell_size
                 grid_height = self.rows * self.cell_size
                 margin_x = (pygame.display.get_surface().get_width() - grid_width) // 2
@@ -473,6 +468,7 @@ class Board:
                 col = (x - margin_x) // self.cell_size
                 row = (y - margin_y) // self.cell_size
 
+                # Vérifier si le clic est dans les limites de la grille
                 if 0 <= col < self.cols and 0 <= row < self.rows:
                     cell = self.grid[row][col]
 
@@ -483,14 +479,26 @@ class Board:
 
                     # Check if an enemy ship is hit
                     if cell["ship"]:
-                        print(f"Player hit an enemy ship at ({row}, {col})!")
-                        cell["player_hit"] = True
+                        # Vérifiez si le bateau appartient à l'ennemi
+                        if any((row, col) in positions for positions in self.enemy.boats.values()):
+                            print(f"Player hit an enemy ship at ({row}, {col})!")
+                            cell["player_hit"] = True
+                            cell["hit_color"] = (255, 0, 0)  # Rouge pour un bateau ennemi touché
+                        else:
+                            print(f"Player hit their own ship at ({row}, {col})!")
+                            cell["player_hit"] = True
+                            cell["hit_color"] = (255, 255, 255)  # Blanc pour un bateau allié touché
                     else:
                         print(f"Player missed at ({row}, {col}).")
                         cell["player_hit"] = True
+                        cell["hit_color"] = (255, 255, 255)  # Blanc pour un tir manqué
 
-                    # Switch to the AI's turn
+                    # Marquer que le premier tir a été effectué
+                    self.first_shot = False
+
+                    # Passer au tour de l'IA immédiatement
                     self.player_turn = False
+                    self.ai_turn()
 
         else:
             # AI's turn
@@ -542,3 +550,28 @@ class Board:
         if hasattr(self, "current_boat_index"):
             del self.current_boat_index  
         print("Grille réinitialisée !")
+
+    def ai_turn(self):
+        """
+        Handles the AI's turn by randomly selecting a cell to target.
+        """
+        while True:
+            row = random.randint(0, self.rows - 1)
+            col = random.randint(0, self.cols - 1)
+            cell = self.grid[row][col]
+
+            # Check if the AI has already hit this cell
+            if cell["ai_hit"]:
+                continue
+
+            # Check if a player's ship is hit
+            if cell["ship"]:
+                print(f"The AI hit your ship at ({row}, {col})!")
+                cell["ai_hit"] = True
+            else:
+                print(f"The AI missed at ({row}, {col}).")
+                cell["ai_hit"] = True
+
+            # Switch back to the player's turn
+            self.player_turn = True
+            break
