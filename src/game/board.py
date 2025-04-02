@@ -4,6 +4,7 @@ from game.button import draw_back_button  # Import directly from button.py
 from game.button import reinit_button
 from utils.boat_type import BoatType 
 import random
+from game.ia import AI
 
 class Board:
     """
@@ -75,6 +76,7 @@ class Board:
         # Assign player and enemy
         self.player = player
         self.enemy = enemy
+        self.ai = AI(strategy="smart")  # Choosing the strategy
 
         # Initialize the placement_complete attribute
         self.placement_complete = False  # Indicates whether all boats have been placed
@@ -444,7 +446,7 @@ class Board:
             - Determines if the player's shot hits an enemy ship or misses.
             - Updates the game grid and switches the turn to the AI.
         AI Turn:
-            - Randomly selects a grid cell to target.
+            - Uses the AI's strategy to select a grid cell to target.
             - Validates if the cell has already been targeted.
             - Determines if the AI's shot hits a player's ship or misses.
             - Updates the game grid and switches the turn back to the player.
@@ -495,26 +497,19 @@ class Board:
         else:
             # AI's turn
             print("AI's turn...")
-            while True:
-                row = random.randint(0, self.rows - 1)
-                col = random.randint(0, self.cols - 1)
-                cell = self.grid[row][col]
+            row, col = self.ai.choose_move(self.grid, self.player.boats)
+            cell = self.grid[row][col]
 
-                # Check if the AI has already hit this cell
-                if cell["ai_hit"]:
-                    continue
+            if cell["ship"]:
+                print(f"The AI hit your ship at ({row}, {col})!")
+                cell["ai_hit"] = True
+                self.ai.update_last_hit(row, col, hit=True)
+            else:
+                print(f"The AI missed at ({row}, {col}).")
+                cell["ai_hit"] = True
+                self.ai.update_last_hit(row, col, hit=False)
 
-                # Check if a player's ship is hit
-                if cell["ship"]:
-                    print(f"The AI hit your ship at ({row}, {col})!")
-                    cell["ai_hit"] = True
-                else:
-                    print(f"The AI missed at ({row}, {col}).")
-                    cell["ai_hit"] = True
-
-                # Switch to the player's turn
-                self.player_turn = True
-                break
+            self.player_turn = True
     
     def check_victory(self):
         """
