@@ -64,6 +64,9 @@ class Board:
         self.button_font = pygame.font.SysFont(None, 30)  # Font for the button
         self.back_button = None  # Back button
         self.reinit_button = None
+        self.winner = None
+        self.player_hits = 0
+        self.ai_hits = 0
 
         # Assign player and enemy
         self.player = player
@@ -157,7 +160,7 @@ class Board:
             - A "Back" button at the bottom right of the screen.
         """
         screen.fill((30, 30, 30))  # Dark gray background
-
+        
         # Draw the title
         title = self.title_font.render("Battle Ship Royale - Mode Solo", True, (255, 255, 255))
         screen.blit(title, (screen.get_width() // 2 - title.get_width() // 2, 10))
@@ -175,15 +178,26 @@ class Board:
         margin_x_right = (3 * screen.get_width() // 4) - (grid_width // 2)
         margin_y = (screen.get_height() - grid_height) // 2 + 50  # Offset to leave space for the title
 
-        # Draw the left grid (Player's ships and AI's hits)
-        self._draw_grid(screen, margin_x_left, margin_y, self.player_grid, show_ships=True, show_hits=True, title="Votre plateau")
+        if self.winner == "player":
+        # Afficher un message de victoire
+            victory_text = self.title_font.render("Victoire ! Vous avez gagné !", True, (255, 255, 255))
+            screen.blit(victory_text, (screen.get_width() // 2 - victory_text.get_width() // 2, screen.get_height() // 2 - victory_text.get_height() // 2))
+        elif self.winner == "ia":
+            # Afficher un message de défaite
+            defeat_text = self.title_font.render("Défaite ! L'enemie a gagné !", True, (255, 255, 255))
+            screen.blit(defeat_text, (screen.get_width() // 2 - defeat_text.get_width() // 2, screen.get_height() // 2 - defeat_text.get_height() // 2))
+        else:
+            # Draw the left grid (Player's ships and AI's hits)
+            self._draw_grid(screen, margin_x_left, margin_y, self.player_grid, show_ships=True, show_hits=True, title="Votre plateau")
 
-        # Draw the right grid (Player's hits on the enemy's ships)
-        self._draw_grid(screen, margin_x_right, margin_y, self.enemy_grid, show_ships=False, show_hits=True, title="Plateau ennemi")
+            # Draw the right grid (Player's hits on the enemy's ships)
+            self._draw_grid(screen, margin_x_right, margin_y, self.enemy_grid, show_ships=False, show_hits=True, title="Plateau ennemi")
+
+        # Draw the reinitialization button
+        self.reinit_button = reinit_button(screen, self.order_font, screen.get_width(), screen.get_height() - 50, text="Réinitialiser")
 
         # Draw the back button
-        self.reinit_button = reinit_button(screen, self.order_font, screen.get_width(), screen.get_height() - 50)
-        self.back_button = draw_back_button(screen, self.button_font, screen.get_width(), screen.get_height())
+        self.back_button = draw_back_button(screen, self.button_font, screen.get_width(), screen.get_height(), text="Retour")
 
 
     def _draw_grid(self, screen, margin_x, margin_y, grid, show_ships, show_hits, title):
@@ -444,9 +458,15 @@ class Board:
                     if cell["ship"]:
                         print(f"Player hit an enemy ship at ({row}, {col})!")
                         cell["player_hit"] = True
+                        self.player_hits += 1  # Incrémenter les coups réussis du joueur
                     else:
                         print(f"Player missed at ({row}, {col}).")
                         cell["player_hit"] = True
+
+                    # Vérifier si le joueur a gagné
+                    if self.player_hits == 17:
+                        self.winner = "player"
+                        return  # Arrêter le tour si le joueur a gagné
 
                     self.player_turn = False
 
@@ -458,11 +478,17 @@ class Board:
             if cell["ship"]:
                 print(f"The AI hit your ship at ({row}, {col})!")
                 cell["ai_hit"] = True
+                self.ai_hits += 1  # Incrémenter les coups réussis de l'IA
                 self.ai.update_last_hit(row, col, hit=True)
             else:
                 print(f"The AI missed at ({row}, {col}).")
                 cell["ai_hit"] = True
                 self.ai.update_last_hit(row, col, hit=False)
+
+            # Vérifier si l'IA a gagné
+            if self.ai_hits == 17:
+                self.winner = "ia"
+                return  # Arrêter le tour si l'IA a gagné
 
             self.player_turn = True
         
@@ -476,8 +502,10 @@ class Board:
                  or None if neither player has won yet.
         """
         if all(len(positions) == 0 for positions in self.enemy.boats.values()):
+            self.winner = "player"
             return "player"
         if all(len(positions) == 0 for positions in self.player.boats.values()):
+            self.winner = "ia"
             return "ia"
         return None
     
