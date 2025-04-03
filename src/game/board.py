@@ -463,6 +463,14 @@ class Board:
                 print(f"The AI missed at ({row}, {col}).")
                 cell["ai_hit"] = True
                 self.ai.update_last_hit(row, col, hit=False)
+            if cell["ship"]:
+                print(f"The AI hit your ship at ({row}, {col})!")
+                cell["ai_hit"] = True
+                self.ai.update_last_hit(row, col, hit=True)
+            else:
+                print(f"The AI missed at ({row}, {col}).")
+                cell["ai_hit"] = True
+                self.ai.update_last_hit(row, col, hit=False)
 
             self.player_turn = True
         
