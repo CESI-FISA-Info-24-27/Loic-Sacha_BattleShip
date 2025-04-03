@@ -184,7 +184,7 @@ class Board:
             screen.blit(victory_text, (screen.get_width() // 2 - victory_text.get_width() // 2, screen.get_height() // 2 - victory_text.get_height() // 2))
         elif self.winner == "ia":
             # Afficher un message de défaite
-            defeat_text = self.title_font.render("Défaite ! L'enemie a gagné !", True, (255, 255, 255))
+            defeat_text = self.title_font.render("Défaite ! L'IA a gagné !", True, (255, 255, 255))
             screen.blit(defeat_text, (screen.get_width() // 2 - defeat_text.get_width() // 2, screen.get_height() // 2 - defeat_text.get_height() // 2))
         else:
             # Draw the left grid (Player's ships and AI's hits)
@@ -242,24 +242,25 @@ class Board:
                 else:
                     pygame.draw.rect(screen, (173, 216, 230), rect)  # Light blue for empty
 
-                # Draw a cross if the cell was hit by the player
+                # Draw a smaller cross if the cell was hit by the player
                 if show_hits and grid[row][col].get("player_hit", False):
                     if grid[row][col]["ship"]:
                         line_color = (255, 0, 0)  # Red for a hit
                     else:
                         line_color = (255, 255, 255)  # White for a miss
-                    pygame.draw.line(screen, line_color, (x, y), (x + self.cell_size, y + self.cell_size), 3)  # Diagonal \
-                    pygame.draw.line(screen, line_color, (x, y + self.cell_size), (x + self.cell_size, y), 3)  # Diagonal /
+                    offset = self.cell_size // 6  # Smaller cross offset
+                    pygame.draw.line(screen, line_color, (x + offset, y + offset), (x + self.cell_size - offset, y + self.cell_size - offset), 2)  # Diagonal \
+                    pygame.draw.line(screen, line_color, (x + offset, y + self.cell_size - offset), (x + self.cell_size - offset, y + offset), 2)  # Diagonal /
 
-                # Draw a circle if the AI hit this cell
+                # Draw a larger circle if the AI hit this cell
                 if grid[row][col].get("ai_hit", False):
                     if grid[row][col]["ship"]:
                         circle_color = (255, 0, 0)  # Red for a hit
                     else:
                         circle_color = (255, 255, 255)  # White for a miss
                     center = (x + self.cell_size // 2, y + self.cell_size // 2)
-                    radius = self.cell_size // 4
-                    pygame.draw.circle(screen, circle_color, center, radius, 3)
+                    radius = self.cell_size // 3  # Larger circle radius
+                    pygame.draw.circle(screen, circle_color, center, radius, 2)
 
                 # Draw the cell border
                 pygame.draw.rect(screen, (0, 0, 0), rect, 1)  # Black border
