@@ -44,16 +44,17 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Utilities</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#utils.boat_type.BoatType"><code class="docutils literal notranslate"><span class="pre">BoatType</span></code></a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#utils.boat_type.BoatType.AIRCRAFT_CARRIER"><code class="docutils literal notranslate"><span class="pre">BoatType.AIRCRAFT_CARRIER</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#utils.boat_type.BoatType.CRUISER"><code class="docutils literal notranslate"><span class="pre">BoatType.CRUISER</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#utils.boat_type.BoatType.DESTROYER"><code class="docutils literal notranslate"><span class="pre">BoatType.DESTROYER</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#utils.boat_type.BoatType.SUBMARINE"><code class="docutils literal notranslate"><span class="pre">BoatType.SUBMARINE</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#utils.boat_type.BoatType.TORPEDO"><code class="docutils literal notranslate"><span class="pre">BoatType.TORPEDO</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id0"><code class="docutils literal notranslate"><span class="pre">BoatType.AIRCRAFT_CARRIER</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id1"><code class="docutils literal notranslate"><span class="pre">BoatType.CRUISER</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id2"><code class="docutils literal notranslate"><span class="pre">BoatType.DESTROYER</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id3"><code class="docutils literal notranslate"><span class="pre">BoatType.SUBMARINE</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id4"><code class="docutils literal notranslate"><span class="pre">BoatType.TORPEDO</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#utils.boat_type.BoatType.AIRCRAFT_CARRIER"><code class="docutils literal notranslate"><span class="pre">BoatType.AIRCRAFT_CARRIER</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id0"><code class="docutils literal notranslate"><span class="pre">BoatType.CRUISER</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id1"><code class="docutils literal notranslate"><span class="pre">BoatType.DESTROYER</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id2"><code class="docutils literal notranslate"><span class="pre">BoatType.SUBMARINE</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id3"><code class="docutils literal notranslate"><span class="pre">BoatType.TORPEDO</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#utils.boat_type.BoatType.name"><code class="docutils literal notranslate"><span class="pre">BoatType.name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#utils.boat_type.BoatType.size"><code class="docutils literal notranslate"><span class="pre">BoatType.size</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -92,25 +93,24 @@
 <dt class="sig sig-object py" id="utils.boat_type.BoatType">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">utils.boat_type.</span></span><span class="sig-name descname"><span class="pre">BoatType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#utils.boat_type.BoatType" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
-<p>BoatType is an enumeration that represents different types of boats used in the game.</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="utils.boat_type.BoatType.AIRCRAFT_CARRIER">
-<span class="sig-name descname"><span class="pre">AIRCRAFT_CARRIER</span></span><a class="headerlink" href="#utils.boat_type.BoatType.AIRCRAFT_CARRIER" title="Link to this definition">¶</a></dt>
-<dd><p>Represents an Aircraft Carrier.</p>
+<p>BoatType is an enumeration that represents different types of boats used in the game,
+along with their respective names and sizes.
+.. attribute:: AIRCRAFT_CARRIER</p>
+<blockquote>
+<div><p>Represents an Aircraft Carrier with a size of 5.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
+<dt class="field-odd">type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
 </dd>
 </dl>
-</dd></dl>
-
+</div></blockquote>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="utils.boat_type.BoatType.CRUISER">
 <span class="sig-name descname"><span class="pre">CRUISER</span></span><a class="headerlink" href="#utils.boat_type.BoatType.CRUISER" title="Link to this definition">¶</a></dt>
-<dd><p>Represents a Cruiser.</p>
+<dd><p>Represents a Cruiser with a size of 4.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
+<dd class="field-odd"><p>tuple</p>
 </dd>
 </dl>
 </dd></dl>
@@ -118,10 +118,10 @@
 <dl class="py attribute">
 <dt class="sig sig-object py" id="utils.boat_type.BoatType.DESTROYER">
 <span class="sig-name descname"><span class="pre">DESTROYER</span></span><a class="headerlink" href="#utils.boat_type.BoatType.DESTROYER" title="Link to this definition">¶</a></dt>
-<dd><p>Represents a Destroyer.</p>
+<dd><p>Represents a Destroyer with a size of 3.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
+<dd class="field-odd"><p>tuple</p>
 </dd>
 </dl>
 </dd></dl>
@@ -129,10 +129,10 @@
 <dl class="py attribute">
 <dt class="sig sig-object py" id="utils.boat_type.BoatType.SUBMARINE">
 <span class="sig-name descname"><span class="pre">SUBMARINE</span></span><a class="headerlink" href="#utils.boat_type.BoatType.SUBMARINE" title="Link to this definition">¶</a></dt>
-<dd><p>Represents a Submarine.</p>
+<dd><p>Represents a Submarine with a size of 3.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
+<dd class="field-odd"><p>tuple</p>
 </dd>
 </dl>
 </dd></dl>
@@ -140,37 +140,52 @@
 <dl class="py attribute">
 <dt class="sig sig-object py" id="utils.boat_type.BoatType.TORPEDO">
 <span class="sig-name descname"><span class="pre">TORPEDO</span></span><a class="headerlink" href="#utils.boat_type.BoatType.TORPEDO" title="Link to this definition">¶</a></dt>
-<dd><p>Represents a Torpedo.</p>
+<dd><p>Represents a Torpedo with a size of 2.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
+<dd class="field-odd"><p>tuple</p>
 </dd>
 </dl>
 </dd></dl>
 
+<dl class="simple">
+<dt>Properties:</dt><dd><p>size (int): Returns the size of the boat type.
+name (str): Returns the name of the boat type.</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="utils.boat_type.BoatType.AIRCRAFT_CARRIER">
+<span class="sig-name descname"><span class="pre">AIRCRAFT_CARRIER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('Aircraft</span> <span class="pre">Carrier',</span> <span class="pre">5)</span></em><a class="headerlink" href="#utils.boat_type.BoatType.AIRCRAFT_CARRIER" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id0">
-<span class="sig-name descname"><span class="pre">AIRCRAFT_CARRIER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Aircraft</span> <span class="pre">Carrier'</span></em><a class="headerlink" href="#id0" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">CRUISER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('Cruiser',</span> <span class="pre">4)</span></em><a class="headerlink" href="#id0" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id1">
-<span class="sig-name descname"><span class="pre">CRUISER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Cruiser'</span></em><a class="headerlink" href="#id1" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">DESTROYER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('Destroyer',</span> <span class="pre">3)</span></em><a class="headerlink" href="#id1" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id2">
-<span class="sig-name descname"><span class="pre">DESTROYER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Destroyer'</span></em><a class="headerlink" href="#id2" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">SUBMARINE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('Submarine',</span> <span class="pre">3)</span></em><a class="headerlink" href="#id2" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id3">
-<span class="sig-name descname"><span class="pre">SUBMARINE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Submarine'</span></em><a class="headerlink" href="#id3" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">TORPEDO</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('Torpedo',</span> <span class="pre">2)</span></em><a class="headerlink" href="#id3" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="py attribute">
-<dt class="sig sig-object py" id="id4">
-<span class="sig-name descname"><span class="pre">TORPEDO</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Torpedo'</span></em><a class="headerlink" href="#id4" title="Link to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="utils.boat_type.BoatType.name">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#utils.boat_type.BoatType.name" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="utils.boat_type.BoatType.size">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">size</span></span><a class="headerlink" href="#utils.boat_type.BoatType.size" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
