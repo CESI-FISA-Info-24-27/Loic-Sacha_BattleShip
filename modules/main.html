@@ -43,7 +43,10 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="utils.html">Utilities</a></li>
 <li class="toctree-l1"><a class="reference internal" href="game.html">Game Logic</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Main Application</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Main Application</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#main.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
 </ul>
 
         </div>
@@ -70,8 +73,30 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="main-application">
-<h1>Main Application<a class="headerlink" href="#main-application" title="Link to this heading">¶</a></h1>
+  <section id="module-main">
+<span id="main-application"></span><h1>Main Application<a class="headerlink" href="#module-main" title="Link to this heading">¶</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="main.main">
+<span class="sig-prename descclassname"><span class="pre">main.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#main.main" title="Link to this definition">¶</a></dt>
+<dd><p>The main function initializes the game and handles the main game loop.
+This function sets up the Pygame environment, creates the game window, and initializes
+the game state, including the menu and game board. It manages the event loop, switching
+between the menu and game screens based on user input, and renders the appropriate screen
+content.
+Key Components:
+- Initializes Pygame and creates a resizable game window.
+- Sets up the player and enemy objects.
+- Manages the game state, switching between “menu” and “game” screens.
+- Handles user input events for both the menu and game screens.
+- Updates the display and ensures a smooth game loop.
+The game loop continues running until the user closes the game window.
+Note:
+- The function assumes the existence of <cite>Player</cite>, <cite>Menu</cite>, and <cite>Board</cite> classes with</p>
+<blockquote>
+<div><p>appropriate methods (<cite>handle_event</cite> and <cite>draw</cite>) to manage their respective functionalities.</p>
+</div></blockquote>
+</dd></dl>
+
 </section>
 
 
