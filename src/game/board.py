@@ -439,7 +439,7 @@ class Board:
             self.player_turn = True 
 
         if self.player_turn:
-            if event.type == pygame.MOUSEBUTTONDOWN:
+            if event and event.type == pygame.MOUSEBUTTONDOWN:
                 grid_width = self.cols * self.cell_size
                 grid_height = self.rows * self.cell_size
                 margin_x_right = (3 * pygame.display.get_surface().get_width() // 4) - (grid_width // 2)
@@ -459,19 +459,19 @@ class Board:
                     if cell["ship"]:
                         print(f"Player hit an enemy ship at ({row}, {col})!")
                         cell["player_hit"] = True
-                        self.player_hits += 1  # Incrémenter les coups réussis du joueur
+                        self.player_hits += 1  # Increment player's successful hits
                     else:
                         print(f"Player missed at ({row}, {col}).")
                         cell["player_hit"] = True
 
-                    # Vérifier si le joueur a gagné
+                    # Check if the player has won
                     if self.player_hits == 17:
                         self.winner = "player"
-                        return  # Arrêter le tour si le joueur a gagné
+                        return  # End the game if the player has won
 
-                    self.player_turn = False
+                    self.player_turn = False  # Switch to AI's turn
 
-        else:
+        if not self.player_turn:
             print("AI's turn...")
             row, col = self.ai.choose_move(self.player_grid, self.player.boats)
             cell = self.player_grid[row][col]
@@ -479,17 +479,18 @@ class Board:
             if cell["ship"]:
                 print(f"The AI hit your ship at ({row}, {col})!")
                 cell["ai_hit"] = True
-                self.ai_hits += 1  # Incrémenter les coups réussis de l'IA
+                self.ai_hits += 1  # Increment AI's successful hits
                 self.ai.update_last_hit(row, col, hit=True)
             else:
                 print(f"The AI missed at ({row}, {col}).")
                 cell["ai_hit"] = True
                 self.ai.update_last_hit(row, col, hit=False)
 
-            # Vérifier si l'IA a gagné
+            # Check if the AI has won
             if self.ai_hits == 17:
+                print("AI has won the game!")
                 self.winner = "ia"
-                return  # Arrêter le tour si l'IA a gagné
+                return  # End the game if the AI has won
 
             self.player_turn = True
         
