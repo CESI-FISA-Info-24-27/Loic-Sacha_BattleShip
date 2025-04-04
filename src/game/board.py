@@ -7,51 +7,45 @@ import random
 from game.ia import AI
 
 class Board:
-    """The `Board` class represents the game board for the Battleship game. It manages the player's and enemy's grids, 
-    handles boat placement, tracks hits and misses, and facilitates the gameplay logic.
-    Attributes:
-        rows (int): Number of rows in the grid. Default is 10.
-        cols (int): Number of columns in the grid. Default is 10.
-        cell_size (int): Size of each cell in pixels. Default is 40.
-        player_grid (list): 2D list representing the player's grid. Each cell contains a dictionary with keys:
-            - "ai_hit" (bool): Whether the AI has hit this cell.
-            - "ship" (bool): Whether a ship occupies this cell.
-        enemy_grid (list): 2D list representing the enemy's grid. Each cell contains a dictionary with keys:
-            - "player_hit" (bool): Whether the player has hit this cell.
-            - "ship" (bool): Whether a ship occupies this cell.
-        font (pygame.font.Font): Font used for rendering text on the board.
-        order_font (pygame.font.Font): Font used for rendering order-related text.
-        title_font (pygame.font.Font): Font used for rendering the title.
-        select_font (pygame.font.Font): Font used for rendering selection text.
-        button_font (pygame.font.Font): Font used for rendering button text.
-        back_button (pygame.Rect): Button for returning to the main menu.
-        reinit_button (pygame.Rect): Button for resetting the grid.
-        player (Player): The player object.
-        enemy (Player): The enemy object.
-        ai (AI): The AI object managing the enemy's moves.
-        placement_complete (bool): Indicates whether all boats have been placed on the player's grid.
-    Methods:
-        __init__(self, rows=10, cols=10, cell_size=40, player=None, enemy=None):
-            Initializes the board with the specified dimensions, player, and enemy. Sets up the grids and fonts.
-        place_enemy_boats(self):
-            Randomly places the enemy's boats on the grid, ensuring no overlap and staying within boundaries.
-        draw(self, screen):
-            Renders the game board, including grids, titles, and buttons, on the given screen.
-        _draw_grid(self, screen, margin_x, margin_y, grid, show_ships, show_hits, title):
-            Helper method to draw a single grid with optional ship and hit visibility.
-        handle_event(self, event):
-            Handles user input events for boat placement, shooting, and button interactions.
-        place_boat(self, event, player):
-            Handles the placement of boats on the player's grid based on user input.
-        is_continuous(self, positions, new_position):
-            Checks if the given positions form a continuous line (either horizontal or vertical).
-        play_turn(self, event):
-            Manages the gameplay turn, alternating between the player and the AI.
-        check_victory(self):
-            Checks if either the player or the AI has won the game by sinking all enemy boats.
-        reset_grid(self):
-            Resets the game board, clearing all boats and hits, and allowing for a new game setup."""
+    
     def __init__(self, rows=10, cols=10, cell_size=40, player=None, enemy=None):
+        """
+        Initializes the game board with specified dimensions, fonts, sounds, and player/enemy configurations.
+        Args:
+            rows (int, optional): Number of rows in the game grid. Defaults to 10.
+            cols (int, optional): Number of columns in the game grid. Defaults to 10.
+            cell_size (int, optional): Size of each cell in the grid (in pixels). Defaults to 40.
+            player (Player, optional): The player object representing the user. Defaults to None.
+            enemy (Player, optional): The enemy object representing the AI opponent. Defaults to None.
+        Attributes:
+            rows (int): Number of rows in the game grid.
+            cols (int): Number of columns in the game grid.
+            cell_size (int): Size of each cell in the grid (in pixels).
+            player_grid (list): 2D list representing the player's grid with cell states.
+            enemy_grid (list): 2D list representing the enemy's grid with cell states.
+            font (pygame.font.Font): Font used for numbers and letters on the grid.
+            order_font (pygame.font.Font): Font used for additional text elements.
+            title_font (pygame.font.Font): Font used for the game title.
+            select_font (pygame.font.Font): Font used for selection text.
+            button_font (pygame.font.Font): Font used for button text.
+            back_button (Button): Button for navigating back in the game. Defaults to None.
+            reinit_button (Button): Button for reinitializing the game. Defaults to None.
+            winner (str): Indicates the winner of the game. Defaults to None.
+            player_hits (int): Counter for the number of hits made by the player.
+            ai_hits (int): Counter for the number of hits made by the AI.
+            hit_sound (pygame.mixer.Sound): Sound effect for a successful hit.
+            miss_sound (pygame.mixer.Sound): Sound effect for a missed shot.
+            loose_sound (pygame.mixer.Sound): Sound effect for losing the game.
+            win_sound (pygame.mixer.Sound): Sound effect for winning the game.
+            sonar_ping_sound (pygame.mixer.Sound): Sound effect for sonar ping.
+            player (Player): The player object representing the user.
+            enemy (Player): The enemy object representing the AI opponent.
+            ai (AI): AI object with a specified strategy for gameplay.
+            placement_complete (bool): Indicates whether all boats have been placed. Defaults to False.
+        Notes:
+            - The enemy's boats are automatically placed if they do not already exist.
+            - Sound effects are loaded from the specified file paths and their volume is adjusted.
+        """
         self.rows = rows
         self.cols = cols
         self.cell_size = cell_size
@@ -67,6 +61,12 @@ class Board:
         self.winner = None
         self.player_hits = 0
         self.ai_hits = 0
+        self.hit_sound = pygame.mixer.Sound("src/assets/sounds/hit.mp3")
+        self.hit_sound.set_volume(0.25)  # Set volume for hit sound
+        self.miss_sound = pygame.mixer.Sound("src/assets/sounds/miss1.mp3")
+        self.loose_sound = pygame.mixer.Sound("src/assets/sounds/loose.mp3")
+        self.win_sound = pygame.mixer.Sound("src/assets/sounds/win.mp3")
+        self.sonar_ping_sound = pygame.mixer.Sound("src/assets/sounds/sonar_ping.mp3")
 
         # Assign player and enemy
         self.player = player
@@ -144,20 +144,31 @@ class Board:
     def draw(self, screen):
         """
         Draws the game board and UI elements on the screen.
-        This method is responsible for rendering the game interface, including the title, 
-        player and enemy names, grids, and buttons. It visually represents the player's 
-        and enemy's game boards, as well as the current state of the game.
+        This method is responsible for rendering the game interface, including the title, player names, 
+        grids, victory/defeat messages, and interactive buttons. It dynamically adjusts the layout 
+        based on the screen dimensions and the game state.
         Args:
-            screen (pygame.Surface): The surface on which the game elements will be drawn.
-        Elements drawn:
-            - Background with a dark gray color.
-            - Title of the game at the top center of the screen.
-            - Player and enemy names displayed at the top left and top right corners, respectively.
-            - Two grids:
-                - Left grid: Displays the player's ships and the AI's hits.
-                - Right grid: Displays the player's hits on the enemy's ships.
-            - A "Reinitialize" button at the bottom center of the screen.
-            - A "Back" button at the bottom right of the screen.
+            screen (pygame.Surface): The surface on which the game elements are drawn.
+        Behavior:
+            - Fills the screen with a dark gray background.
+            - Displays the game title at the top center of the screen.
+            - Shows the player's and enemy's names at the top left and top right corners, respectively.
+            - Calculates margins and positions for the grids and draws:
+                - The player's grid (left) with ships and AI's hits.
+                - The enemy's grid (right) with the player's hits.
+            - If the game is over:
+                - Displays a victory message if the player wins, or a defeat message if the AI wins.
+                - Plays the corresponding sound effect (victory or defeat) only once.
+            - If the game is not over:
+                - Displays a "Reinitialize" button to reset the game.
+            - Always displays a "Back" button to return to the previous menu.
+        Note:
+            - The method uses `self.winner` to determine the game state:
+                - "player" indicates the player has won.
+                - "ia" indicates the AI has won.
+                - None indicates the game is ongoing.
+            - The `self._draw_grid` method is used to render the grids.
+            - The `reinit_button` and `draw_back_button` functions are used to create interactive buttons.
         """
         screen.fill((30, 30, 30))  # Dark gray background
 
@@ -179,13 +190,25 @@ class Board:
         margin_y = (screen.get_height() - grid_height) // 2 + 50  # Offset to leave space for the title
 
         if self.winner == "player":
-            # Afficher un message de victoire
+            # Print a victory message
             victory_text = self.title_font.render("Victoire ! Vous avez gagné !", True, (255, 255, 255))
             screen.blit(victory_text, (screen.get_width() // 2 - victory_text.get_width() // 2, screen.get_height() // 2 - victory_text.get_height() // 2))
+            
+            # Play the victory sound (only once)
+            if not hasattr(self, "victory_sound_played"):
+                self.win_sound.play()
+                self.victory_sound_played = True
+
         elif self.winner == "ia":
-            # Afficher un message de défaite
+            # Print a defeat message
             defeat_text = self.title_font.render("Défaite ! L'IA a gagné !", True, (255, 255, 255))
             screen.blit(defeat_text, (screen.get_width() // 2 - defeat_text.get_width() // 2, screen.get_height() // 2 - defeat_text.get_height() // 2))
+            
+            # Play the defeat sound (only once)
+            if not hasattr(self, "loose_sound_played"):
+                self.loose_sound.play()
+                self.loose_sound_played = True
+
         else:
             # Draw the left grid (Player's ships and AI's hits)
             self._draw_grid(screen, margin_x_left, margin_y, self.player_grid, show_ships=True, show_hits=True, title="Votre plateau")
@@ -198,7 +221,6 @@ class Board:
 
         # Draw the back button
         self.back_button = draw_back_button(screen, self.button_font, screen.get_width(), screen.get_height(), text="Retour")
-
 
     def _draw_grid(self, screen, margin_x, margin_y, grid, show_ships, show_hits, title):
         """
@@ -311,32 +333,25 @@ class Board:
     def place_boat(self, event, player):
         """
         Handles the placement of boats on the player's grid during the setup phase of the game.
-        This method allows the player to place boats on their grid by clicking on the game board.
-        Boats are placed one at a time, and their positions are validated to ensure they are
-        continuous and aligned either horizontally or vertically.
+        This method is triggered by a mouse click event and allows the player to place boats
+        on their grid by selecting cells. Boats are placed one at a time, and their positions
+        must be continuous and either in a straight row or column.
         Args:
-            event (pygame.event.Event): The Pygame event triggered by the player's interaction,
-                        typically a mouse button click.
-            player (Player): The player object representing the current player, used to store
-                     the boat positions.
+            event (pygame.event.Event): The pygame event triggered by a mouse click.
+            player (Player): The player object to which the boats belong.
         Behavior:
             - Calculates the grid cell based on the mouse click position.
-            - Ensures the clicked cell is within the grid boundaries.
             - Initializes the placement of the current boat if not already started.
             - Adds the clicked cell to the current boat's positions if it is valid.
-            - Validates that the boat's positions are continuous and aligned.
-            - Marks the grid cell as occupied by a ship.
-            - Once the current boat is fully placed (all required positions are filled), its
-              positions are saved to the player's boat emplacements.
-            - Proceeds to the next boat until all boats are placed.
-            - Marks the placement phase as complete when all boats are placed.
+            - Ensures the boat's positions are continuous and aligned either horizontally or vertically.
+            - Marks the grid cell as occupied by a ship and plays a sonar ping sound.
+            - Finalizes the placement of the current boat when all required positions are filled.
+            - Moves to the next boat or completes the placement phase when all boats are placed.
         Notes:
-            - The method relies on the `BoatType` enumeration to determine the boats' names and sizes.
-            - The `is_continuous` method is used to validate the continuity of the boat's positions.
-            - The `player_grid` attribute is updated to reflect the placement of boats.
-            - The `placement_complete` attribute is set to True when all boats are placed.
-        Raises:
-            None
+            - The method uses attributes like `current_boat_index`, `current_boat`, and `placement_complete`
+              to track the state of the boat placement process.
+            - The `player_grid` is updated to reflect the positions of the boats.
+            - The `set_boat_emplacement` method of the `Player` object is called to store the boat's positions.
         """
         if not hasattr(self, "placement_complete") or not self.placement_complete:
             if event.type == pygame.MOUSEBUTTONDOWN:
@@ -361,6 +376,7 @@ class Board:
                     if len(self.current_boat["positions"]) == 0:
                         self.current_boat["positions"].append((row, col))
                         self.player_grid[row][col]["ship"] = True
+                        self.sonar_ping_sound.play()  # Jouer le son lors du placement initial
                     else:
                         first_row, first_col = self.current_boat["positions"][0]
                         if (row == first_row or col == first_col) and (row, col) not in self.current_boat["positions"]:
@@ -370,6 +386,7 @@ class Board:
                                 return
                             self.current_boat["positions"].append((row, col))
                             self.player_grid[row][col]["ship"] = True
+                            self.sonar_ping_sound.play()  # Jouer le son pour chaque position ajoutée
 
                     if len(self.current_boat["positions"]) == self.current_boat["size"]:
                         for position in self.current_boat["positions"]:
@@ -414,28 +431,28 @@ class Board:
     
     def play_turn(self, event):
         """
-        Handles the logic for a single turn in the game, alternating between the player and the AI.
+        Handles the logic for a single turn in the Battleship game.
         Parameters:
             event (pygame.event.Event): The event triggered by the player, typically a mouse click.
-        Player's Turn:
-            - Checks if it's the player's turn to play.
-            - Determines the grid cell clicked by the player based on the mouse position.
-            - Validates if the clicked cell is within the enemy grid bounds.
-            - If the cell has already been targeted, informs the player and ends the turn.
-            - If the cell contains an enemy ship, marks it as a hit and notifies the player.
-            - If the cell does not contain a ship, marks it as a miss and notifies the player.
-            - Ends the player's turn and switches to the AI's turn.
-        AI's Turn:
-            - Executes the AI's move by selecting a cell on the player's grid.
-            - If the selected cell contains a player's ship, marks it as a hit and updates the AI's strategy.
-            - If the selected cell does not contain a ship, marks it as a miss and updates the AI's strategy.
-            - Ends the AI's turn and switches back to the player's turn.
+        Behavior:
+            - If it's the player's turn:
+                - Detects the cell clicked by the player on the enemy grid.
+                - Checks if the cell has already been targeted. If so, notifies the player and exits.
+                - If the cell contains a ship, marks it as a hit, increments the player's successful hits,
+                  and plays the hit sound. Otherwise, marks it as a miss and plays the miss sound.
+                - Checks if the player has won by hitting all enemy ships. If so, sets the winner to "player"
+                  and ends the game.
+                - Switches the turn to the AI if the game is not over.
+            - If it's the AI's turn:
+                - The AI selects a cell to target on the player's grid.
+                - If the cell contains a ship, marks it as a hit, increments the AI's successful hits,
+                  and updates the AI's strategy. Otherwise, marks it as a miss and updates the AI's strategy.
+                - Checks if the AI has won by hitting all player ships. If so, sets the winner to "ia"
+                  and ends the game.
+                - Switches the turn back to the player if the game is not over.
         Notes:
-            - The player's grid and the enemy's grid are represented as 2D arrays of cells.
-            - Each cell is a dictionary containing information about whether it contains a ship and whether it has been hit.
-            - The AI's behavior is determined by the `choose_move` and `update_last_hit` methods.
-        Raises:
-            AttributeError: If the `player_turn` attribute is not initialized properly.
+            - The game alternates turns between the player and the AI.
+            - The game ends when either the player or the AI hits all 17 ship cells.
         """
         if not hasattr(self, "player_turn"):
             self.player_turn = True 
@@ -462,9 +479,15 @@ class Board:
                         print(f"Player hit an enemy ship at ({row}, {col})!")
                         cell["player_hit"] = True
                         self.player_hits += 1  # Increment player's successful hits
+
+                        # Play the hit sound
+                        self.hit_sound.play()
                     else:
                         print(f"Player missed at ({row}, {col}).")
                         cell["player_hit"] = True
+
+                        # Play the miss sound
+                        self.miss_sound.play()
 
                     # Check if the player has won
                     if self.player_hits == 17:
