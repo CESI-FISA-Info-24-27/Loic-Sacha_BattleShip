@@ -6,12 +6,12 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Game Logic &mdash; Battle Ship Royal 1.0.0 documentation</title>
+  <title>Game Logic &mdash; Battle Ship Royal 3.0.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
 
   
-      <script src="../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../_static/documentation_options.js?v=08bfcbec"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -59,6 +59,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#id0"><code class="docutils literal notranslate"><span class="pre">Menu.draw()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#id1"><code class="docutils literal notranslate"><span class="pre">Menu.draw_main_menu()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#id2"><code class="docutils literal notranslate"><span class="pre">Menu.handle_event()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#game.menu.Menu.play_music"><code class="docutils literal notranslate"><span class="pre">Menu.play_music()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#id3"><code class="docutils literal notranslate"><span class="pre">Menu.update_buttons()</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#game.menu.Menu.button_height"><code class="docutils literal notranslate"><span class="pre">Menu.button_height</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#game.menu.Menu.button_x"><code class="docutils literal notranslate"><span class="pre">Menu.button_x</span></code></a></li>
@@ -286,6 +287,24 @@ if the quit button is clicked.</p>
 <dd class="field-even"><p>str or None</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="game.menu.Menu.play_music">
+<span class="sig-name descname"><span class="pre">play_music</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">music_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#game.menu.Menu.play_music" title="Link to this definition">¶</a></dt>
+<dd><p>Plays background music in a loop.</p>
+<p>This method stops any currently playing music, loads a new music file,
+sets the volume, and plays the music in an infinite loop.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>music_path</strong> (<em>str</em>) – The file path to the music file to be played.</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Ensure that the <cite>pygame.mixer</cite> module is initialized before calling
+this method, and the provided music file path is valid and accessible.</p>
+</div>
 </dd></dl>
 
 <dl class="py method">
