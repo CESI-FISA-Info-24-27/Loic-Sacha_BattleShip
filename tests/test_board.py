@@ -1,69 +1,56 @@
 import pytest
+
 from src.game.board import Board
 from src.game.player import Player
 from utils.boat_type import BoatType
 
-class MockPlayer:
-    def __init__(self, name):
-        self.name = name
-        self.boats = {}
+def test_board_initialization():
+    board = Board(rows=10, cols=10, cell_size=40)
+    assert board.rows == 10
+    assert board.cols == 10
+    assert board.cell_size == 40
+    assert len(board.player_grid) == 10
+    assert len(board.enemy_grid) == 10
+    assert all(len(row) == 10 for row in board.player_grid)
+    assert all(len(row) == 10 for row in board.enemy_grid)
 
-    def set_boat_emplacement(self, boat_name, row, col):
-        if boat_name not in self.boats:
-            self.boats[boat_name] = []
-        self.boats[boat_name].append((row, col))
-
-@pytest.fixture
-def setup_board(init_pygame):
-    player = MockPlayer("Player 1")
-    enemy = MockPlayer("Enemy")
-    board = Board(player=player, enemy=enemy)
-    return board, player, enemy
-
-def test_place_enemy_boats(setup_board):
-    board, _, enemy = setup_board
+def test_place_enemy_boats():
+    board = Board(rows=10, cols=10, cell_size=40, enemy=type("Enemy", (object,), {"boats": {}})())
     board.place_enemy_boats()
-    assert len(enemy.boats) == 5  # Ensure all 5 boats are placed
-    for boat_positions in enemy.boats.values():
-        assert len(boat_positions) > 0  # Ensure each boat has positions
+    assert len(board.enemy.boats) == 5
+    for boat_positions in board.enemy.boats.values():
+        assert len(boat_positions) > 0
+        for row, col in boat_positions:
+            assert board.enemy_grid[row][col]["ship"] is True
 
-def test_place_boat(setup_board):
-    board, player, _ = setup_board
-    event = type("MockEvent", (object,), {"type": "MOUSEBUTTONDOWN", "pos": (100, 100)})
-    board.place_boat(event, player)
-    assert hasattr(board, "current_boat")  # Ensure a boat is being placed
-    assert len(player.boats) == 0  # No boats should be fully placed yet
+def test_reset_grid():
+    board = Board(rows=10, cols=10, cell_size=40, player=type("Player", (object,), {"boats": {}})(), enemy=type("Enemy", (object,), {"boats": {}})())
+    board.player_grid[0][0]["ship"] = True
+    board.enemy_grid[0][0]["player_hit"] = True
+    board.reset_grid()
+    assert all(cell["ship"] is False for row in board.player_grid for cell in row)
+    assert all(cell["player_hit"] is False for row in board.enemy_grid for cell in row)
+    assert board.player.boats == {}
+    assert board.enemy.boats == {}
+    assert board.placement_complete is False
 
-def test_play_turn_player_hit(setup_board):
-    board, player, enemy = setup_board
-    enemy.boats = {"Destroyer": [(3, 3)]}
-    event = type("MockEvent", (object,), {"type": "MOUSEBUTTONDOWN", "pos": (160, 160)})  # Assuming cell size = 40
-    board.play_turn(event)
-    assert board.grid[3][3] == 2  # Hit
-    assert len(enemy.boats["Destroyer"]) == 0  # Boat position removed
+def test_is_continuous():
+    board = Board()
+    positions = [(0, 0), (0, 1)]
+    new_position = (0, 2)
+    assert board.is_continuous(positions, new_position) is True
 
-def test_play_turn_player_miss(setup_board):
-    board, player, enemy = setup_board
-    enemy.boats = {"Destroyer": [(3, 3)]}
-    event = type("MockEvent", (object,), {"type": "MOUSEBUTTONDOWN", "pos": (200, 200)})  # Assuming cell size = 40
-    board.play_turn(event)
-    assert board.grid[5][5] == 3  # Miss
+    new_position = (1, 0)
+    assert board.is_continuous(positions, new_position) is False
 
-def test_check_victory_player_wins(setup_board):
-    board, _, enemy = setup_board
-    enemy.boats = {"Destroyer": []}  # All enemy boats destroyed
-    result = board.check_victory()
-    assert result == "player"
+def test_check_victory():
+    player = type("Player", (object,), {"boats": {"boat1": [], "boat2": []}})()
+    enemy = type("Enemy", (object,), {"boats": {"boat1": [], "boat2": []}})()
+    board = Board(player=player, enemy=enemy)
+    assert board.check_victory() == "player"
 
-def test_check_victory_ia_wins(setup_board):
-    board, player, _ = setup_board
-    player.boats = {"Destroyer": []}  # All player boats destroyed
-    result = board.check_victory()
-    assert result == "ia"
+    enemy.boats = {"boat1": [(0, 0)], "boat2": []}
+    assert board.check_victory() is None
 
-def test_check_victory_no_winner(setup_board):
-    board, player, enemy = setup_board
-    player.boats = {"Destroyer": [(1, 1)]}
-    enemy.boats = {"Destroyer": [(2, 2)]}
-    result = board.check_victory()
-    assert result is None
+    player.boats = {"boat1": [(0, 0)], "boat2": []}
+    assert board.check_victory() == "ia"

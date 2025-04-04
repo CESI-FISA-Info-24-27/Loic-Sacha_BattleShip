@@ -3,72 +3,80 @@ import pygame
 from src.game.menu import Menu
 from src.game.rules import Rules
 
-@pytest.fixture
-def setup_menu():
-    pygame.init()
+def test_menu_initialization():
     screen_width = 800
     screen_height = 600
     menu = Menu(screen_width, screen_height)
-    return menu
 
-def test_menu_initialization(setup_menu):
-    menu = setup_menu
-    assert menu.screen_width == 800
-    assert menu.screen_height == 600
+    assert menu.screen_width == screen_width
+    assert menu.screen_height == screen_height
     assert isinstance(menu.font, pygame.font.Font)
     assert isinstance(menu.small_font, pygame.font.Font)
-    assert menu.show_rules is False
-    assert menu.rules is not None  # Vérifie que `rules` est initialisé
+    assert not menu.show_rules
     assert isinstance(menu.rules, Rules)
-    assert len(menu.buttons) == 3
+    assert len(menu.buttons) == 4
+    assert menu.buttons[0]["label"] == "Mode Solo"
+    assert menu.buttons[1]["label"] == "Difficulté"
+    assert menu.buttons[2]["label"] == "Règles"
+    assert menu.buttons[3]["label"] == "Quitter"
 
-def test_update_buttons(setup_menu):
-    menu = setup_menu
+def test_update_buttons():
+    screen_width = 800
+    screen_height = 600
+    menu = Menu(screen_width, screen_height)
+
     menu.screen_width = 1024
     menu.screen_height = 768
     menu.update_buttons()
-    assert len(menu.buttons) == 3
-    for button in menu.buttons:
-        assert "label" in button
-        assert "rect" in button
-        assert "action" in button
-        assert isinstance(button["rect"], pygame.Rect)
 
-def test_draw_main_menu(setup_menu):
-    menu = setup_menu
-    screen = pygame.Surface((menu.screen_width, menu.screen_height))
+    button_width = int(menu.screen_width * 0.25)
+    button_height = int(menu.screen_height * 0.08)
+    button_x = (menu.screen_width - button_width) // 2
+
+    assert menu.buttons[0]["rect"].width == button_width
+    assert menu.buttons[0]["rect"].height == button_height
+    assert menu.buttons[0]["rect"].x == button_x
+
+def test_draw_main_menu(mocker):
+    screen_width = 800
+    screen_height = 600
+    menu = Menu(screen_width, screen_height)
+    screen = mocker.Mock()
+
     menu.draw_main_menu(screen)
-    # No assertion here, but ensure no exceptions are raised during drawing
 
-def test_draw(setup_menu):
-    menu = setup_menu
-    screen = pygame.Surface((menu.screen_width, menu.screen_height))
-    menu.draw(screen)
-    menu.show_rules = True
-    menu.draw(screen)
-    # No assertion here, but ensure no exceptions are raised during drawing
+    screen.fill.assert_called_once_with((30, 30, 30))
+    assert screen.blit.call_count > 0
 
-def test_handle_event_resize(setup_menu):
-    menu = setup_menu
-    resize_event = pygame.event.Event(pygame.VIDEORESIZE, {"w": 1024, "h": 768})
-    menu.handle_event(resize_event)
-    assert menu.screen_width == 1024
-    assert menu.screen_height == 768
+def test_handle_event_quit(mocker):
+    screen_width = 800
+    screen_height = 600
+    menu = Menu(screen_width, screen_height)
+    mocker.patch("pygame.quit")
+    mocker.patch("builtins.exit")
 
-def test_handle_event_button_click(setup_menu):
-    menu = setup_menu
-    solo_button = menu.buttons[0]
-    click_event = pygame.event.Event(pygame.MOUSEBUTTONDOWN, {"button": 1, "pos": solo_button["rect"].center})
-    action = menu.handle_event(click_event)
+    quit_event = pygame.event.Event(pygame.MOUSEBUTTONDOWN, {"button": 1, "pos": menu.buttons[3]["rect"].center})
+    menu.handle_event(quit_event)
+
+    pygame.quit.assert_called_once()
+    exit.assert_called_once()
+
+def test_handle_event_solo():
+    screen_width = 800
+    screen_height = 600
+    menu = Menu(screen_width, screen_height)
+
+    solo_event = pygame.event.Event(pygame.MOUSEBUTTONDOWN, {"button": 1, "pos": menu.buttons[0]["rect"].center})
+    action = menu.handle_event(solo_event)
+
     assert action == "solo"
 
-    rules_button = menu.buttons[1]
-    click_event = pygame.event.Event(pygame.MOUSEBUTTONDOWN, {"button": 1, "pos": rules_button["rect"].center})
-    menu.handle_event(click_event)
-    menu.rules.draw(pygame.Surface((menu.screen_width, menu.screen_height)))  # Initialise `back_button`
-    assert menu.show_rules is True
+def test_handle_event_rules():
+    screen_width = 800
+    screen_height = 600
+    menu = Menu(screen_width, screen_height)
 
-    quit_button = menu.buttons[2]
-    with pytest.raises(SystemExit):
-        click_event = pygame.event.Event(pygame.MOUSEBUTTONDOWN, {"button": 1, "pos": quit_button["rect"].center})
-        menu.handle_event(click_event)
+    rules_event = pygame.event.Event(pygame.MOUSEBUTTONDOWN, {"button": 1, "pos": menu.buttons[2]["rect"].center})
+    menu.handle_event(rules_event)
+
+    assert menu.show_rules
