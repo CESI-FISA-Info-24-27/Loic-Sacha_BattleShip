@@ -160,7 +160,7 @@ class Board:
             - A "Back" button at the bottom right of the screen.
         """
         screen.fill((30, 30, 30))  # Dark gray background
-        
+
         # Draw the title
         title = self.title_font.render("Battle Ship Royale - Mode Solo", True, (255, 255, 255))
         screen.blit(title, (screen.get_width() // 2 - title.get_width() // 2, 10))
@@ -179,7 +179,7 @@ class Board:
         margin_y = (screen.get_height() - grid_height) // 2 + 50  # Offset to leave space for the title
 
         if self.winner == "player":
-        # Afficher un message de victoire
+            # Afficher un message de victoire
             victory_text = self.title_font.render("Victoire ! Vous avez gagné !", True, (255, 255, 255))
             screen.blit(victory_text, (screen.get_width() // 2 - victory_text.get_width() // 2, screen.get_height() // 2 - victory_text.get_height() // 2))
         elif self.winner == "ia":
@@ -193,8 +193,8 @@ class Board:
             # Draw the right grid (Player's hits on the enemy's ships)
             self._draw_grid(screen, margin_x_right, margin_y, self.enemy_grid, show_ships=False, show_hits=True, title="Plateau ennemi")
 
-        # Draw the reinitialization button
-        self.reinit_button = reinit_button(screen, self.order_font, screen.get_width(), screen.get_height() - 50, text="Réinitialiser")
+            # Draw the reinitialization button only if the game is not over
+            self.reinit_button = reinit_button(screen, self.order_font, screen.get_width(), screen.get_height() - 50, text="Réinitialiser")
 
         # Draw the back button
         self.back_button = draw_back_button(screen, self.button_font, screen.get_width(), screen.get_height(), text="Retour")
@@ -293,10 +293,12 @@ class Board:
         if event.type == pygame.MOUSEBUTTONDOWN:
             # Verify if the "Back" button is clicked
             if self.back_button.collidepoint(event.pos):
+                if self.winner is not None:
+                    self.reset_grid()  # Reset the game only if it is over
                 return "menu"  # Retour au menu principal
 
-            # Verify if the "Reset" button is clicked
-            if self.reinit_button.collidepoint(event.pos):
+            # Verify if the "Reset" button is clicked (only if the game is not over)
+            if self.winner is None and self.reinit_button.collidepoint(event.pos):
                 self.reset_grid()
 
             # If boat placement is complete, handle the player's turn
@@ -532,12 +534,27 @@ class Board:
         Prints:
         - A message "Grille réinitialisée !" to indicate the grid has been reset.
         """
-        self.grid = [[{"player_hit": False, "ai_hit": False, "ship": False} for _ in range(self.cols)] for _ in range(self.rows)]
+        # Reset the grids
+        self.player_grid = [[{"ai_hit": False, "ship": False} for _ in range(self.cols)] for _ in range(self.rows)]
+        self.enemy_grid = [[{"player_hit": False, "ship": False} for _ in range(self.cols)] for _ in range(self.rows)]
+
+        # Reset the boats
         self.player.boats = {}
         self.enemy.boats = {}
+
+        # Reset the placement state
         self.placement_complete = False
         if hasattr(self, "current_boat"):
             del self.current_boat
         if hasattr(self, "current_boat_index"):
-            del self.current_boat_index  
-        print("Grille réinitialisée !")
+            del self.current_boat_index
+
+        # Reset the hit counters
+        self.player_hits = 0
+        self.ai_hits = 0
+
+        # Reset the winner state
+        self.winner = None
+
+        # Place enemy boats again
+        self.place_enemy_boats()
