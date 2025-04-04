@@ -45,10 +45,12 @@ def main():
                 action = menu.handle_event(event)
                 if action == "solo":
                     current_screen = "game"
+                    menu.play_music(menu.ingame_music)  # Switch to in-game music
             elif current_screen == "game":
                 action = board.handle_event(event)
                 if action == "menu":
                     current_screen = "menu"
+                    menu.play_music(menu.menu_music)  # Switch back to menu music
 
         # Render based on the current screen
         screen.fill((0, 0, 0))  # Black background

@@ -32,6 +32,38 @@ class Menu:
         self.show_rules = False  # State to show or hide the rules
         self.rules = Rules(screen_width, screen_height)  # Instance of the Rules class
         self.update_buttons()  # Initialize buttons
+        
+        self.menu_music = "src/assets/sounds/music_menu.mp3"
+        pygame.mixer.music.load(self.menu_music)
+        pygame.mixer.music.set_volume(0.5)
+        pygame.mixer.music.play(-1)  
+        
+        self.ingame_music = "src/assets/sounds/music_ingame.mp3"
+        pygame.mixer.music.load(self.ingame_music)
+        pygame.mixer.music.set_volume(0.5)
+        pygame.mixer.music.play(-1)
+        
+        # Play menu music by default
+        self.play_music(self.menu_music)
+
+    def play_music(self, music_path):
+        """
+        Plays background music in a loop.
+
+        This method stops any currently playing music, loads a new music file,
+        sets the volume, and plays the music in an infinite loop.
+
+        Args:
+            music_path (str): The file path to the music file to be played.
+
+        Note:
+            Ensure that the `pygame.mixer` module is initialized before calling
+            this method, and the provided music file path is valid and accessible.
+        """
+        pygame.mixer.music.stop()  # Stop any currently playing music
+        pygame.mixer.music.load(music_path)  # Load the new music file
+        pygame.mixer.music.set_volume(0.5)  # Set the volume (0.0 to 1.0)
+        pygame.mixer.music.play(-1)  # Play the music in an infinite loop
 
     def update_buttons(self):
         """

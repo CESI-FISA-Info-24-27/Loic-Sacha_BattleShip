@@ -79,16 +79,6 @@ target/
 profile_default/
 ipython_config.py
 
-# Pygame assets
-assets/
-*.wav
-*.mp3
-*.ogg
-*.png
-*.jpg
-*.jpeg
-*.gif
-
 # VSCode
 .vscode/
 
