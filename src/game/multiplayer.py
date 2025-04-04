@@ -1,47 +1,34 @@
 import pygame
-import requests
 from game.board import Board
+from utils.battleship_connection import BattleshipConnection  # Importez la classe BattleshipConnection
 
 class MultiplayerBoard(Board):
     """
     Classe pour gérer le mode multijoueur.
-    Hérite de la classe Board et ajoute des fonctionnalités pour la communication avec le serveur.
+    Hérite de la classe Board et utilise BattleshipConnection pour la communication avec le serveur.
     """
-    def __init__(self, rows, cols, cell_size, player):
+    def __init__(self, rows, cols, cell_size, player, port=5000, matchmaking_url="https://rfosse.pythonanywhere.com"):
         super().__init__(rows, cols, cell_size, player=player, enemy=None)
-        self.server_url = "https://rfosse.pythonanywhere.com:5000"  # Adresse du serveur Flask
+        self.connection = BattleshipConnection(username=player.name, port=port, matchmaking_url=matchmaking_url)
         self.match_code = None  # Code du match pour identifier la partie
 
     def create_match(self):
         """Crée un match sur le serveur."""
-        url = f"{self.server_url}/create_match"
-        data = {"player_id": self.player.name, "code": None}
-        response = requests.post(url, json=data)
-        if response.status_code == 200:
-            self.match_code = response.json().get("code")
-            print(f"Match créé avec le code : {self.match_code}")
-        else:
-            print(f"Erreur lors de la création du match : {response.json()}")
+        self.connection.propose_match(target_username=None)  # Crée une partie sans cible spécifique
+        self.match_code = self.connection.match_code
+        print(f"Partie créée avec succès. Code de la partie : {self.match_code}")
 
     def join_match(self, code):
-        """Rejoignez un match existant."""
-        url = f"{self.server_url}/join_match"
-        data = {"player_id": self.player.name, "code": code}
-        response = requests.post(url, json=data)
-        if response.status_code == 200:
-            print(f"Rejoint le match avec le code : {code}")
-        else:
-            print(f"Erreur lors de la connexion au match : {response.json()}")
+        """Rejoindre une partie existante."""
+        if self.connection.join_match(match_code=code):
+            self.match_code = code
+            print(f"Rejoint la partie avec succès. Adversaire : {self.connection.opponent}")
 
     def send_move(self, row, col):
         """Envoyez un mouvement au serveur."""
-        url = f"{self.server_url}/send_move"
-        data = {"match_code": self.match_code, "player_id": self.player.name, "row": row, "col": col}
-        response = requests.post(url, json=data)
-        if response.status_code == 200:
-            print(f"Mouvement envoyé : ({row}, {col})")
-        else:
-            print(f"Erreur lors de l'envoi du mouvement : {response.json()}")
+        move = (row, col)
+        self.connection.send_move(move)
+        print(f"Mouvement envoyé : {move}")
 
     def handle_event(self, event):
         """Gérez les événements pour le mode multijoueur."""

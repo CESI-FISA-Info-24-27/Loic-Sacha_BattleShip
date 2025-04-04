@@ -27,11 +27,12 @@ class Menu:
     def __init__(self, screen_width, screen_height):
         self.screen_width = screen_width
         self.screen_height = screen_height
-        self.font = pygame.font.SysFont(None, int(screen_height * 0.06))  # Font size relative to screen height
-        self.small_font = pygame.font.SysFont(None, int(screen_height * 0.03))  # Font for small texts
-        self.show_rules = False  # State to show or hide the rules
-        self.rules = Rules(screen_width, screen_height)  # Instance of the Rules class
-        self.update_buttons()  # Initialize buttons
+        self.font = pygame.font.SysFont(None, 48)
+        self.buttons = []
+        self.multiplayer_buttons = []  # Boutons spécifiques au mode multijoueur
+        self.show_multiplayer_options = False  # Indicateur pour afficher les options multijoueurs
+        self.show_rules = False  # Indicateur pour afficher les règles
+        self.update_buttons()
 
     def update_buttons(self):
         """
@@ -61,23 +62,27 @@ class Menu:
             {"label": "Quitter", "rect": pygame.Rect(button_x, int(self.screen_height * 0.6), button_width, button_height), "action": "quit"},
         ]
 
+        # Boutons spécifiques au mode multijoueur
+        self.multiplayer_buttons = [
+            {"label": "Créer une Partie", "rect": pygame.Rect(button_x, int(self.screen_height * 0.4), button_width, button_height), "action": "create_match"},
+            {"label": "Rejoindre une Partie", "rect": pygame.Rect(button_x, int(self.screen_height * 0.5), button_width, button_height), "action": "join_match"},
+            {"label": "Retour", "rect": pygame.Rect(button_x, int(self.screen_height * 0.6), button_width, button_height), "action": "menu"},
+        ]
+
     def draw(self, screen):
-        """
-        Draws the current menu screen on the provided surface.
+        """Dessine le menu principal ou les options multijoueurs."""
+        screen.fill((30, 30, 30))  # Fond gris foncé
+        title = self.font.render("Battle Ship Royale", True, (255, 255, 255))
+        screen.blit(title, (self.screen_width // 2 - title.get_width() // 2, int(self.screen_height * 0.1)))
 
-        This method determines whether to display the main menu or the rules page
-        based on the `show_rules` attribute. If `show_rules` is True, it draws the
-        rules page using the `rules.draw` method. Otherwise, it displays the main
-        menu using the `draw_main_menu` method.
+        buttons_to_draw = self.multiplayer_buttons if self.show_multiplayer_options else self.buttons
 
-        Args:
-            screen (pygame.Surface): The surface on which to draw the menu.
-        """
-        """Draws the main menu or the rules page."""
-        if self.show_rules:
-            self.rules.draw(screen)
-        else:
-            self.draw_main_menu(screen)
+        for button in buttons_to_draw:
+            pygame.draw.rect(screen, (0, 128, 255), button["rect"])  # Fond bleu
+            pygame.draw.rect(screen, (255, 255, 255), button["rect"], 2)  # Bordure blanche
+            label = self.font.render(button["label"], True, (255, 255, 255))
+            screen.blit(label, (button["rect"].x + button["rect"].width // 2 - label.get_width() // 2,
+                                button["rect"].y + button["rect"].height // 2 - label.get_height() // 2))
 
     def draw_main_menu(self, screen):
         """
@@ -109,38 +114,24 @@ class Menu:
         screen.blit(version_text, (self.screen_width - version_text.get_width() - 10, self.screen_height - version_text.get_height() - 10))
 
     def handle_event(self, event):
-        """
-        Handles events for the menu, including window resizing, button clicks, 
-        and toggling the rules display.
-        Args:
-            event (pygame.event.Event): The event to handle.
-        Returns:
-            str or None: Returns "solo" if the solo mode button is clicked, 
-            or None if no specific action is triggered. Exits the program 
-            if the quit button is clicked.
-        """
-        """Handles button clicks."""
-        if event.type == pygame.VIDEORESIZE:
-            # Update window size and buttons
-            self.screen_width, self.screen_height = event.w, event.h
-            self.update_buttons()
-            self.rules = Rules(self.screen_width, self.screen_height)  # Update rules
+        """Gère les événements du menu."""
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # Clic gauche
+            buttons_to_check = self.multiplayer_buttons if self.show_multiplayer_options else self.buttons
 
-        if self.show_rules:
-            action = self.rules.handle_event(event)
-            if action == "menu":
-                self.show_rules = False
-        else:
-            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # Left click
-                for button in self.buttons:
-                    if button["rect"].collidepoint(event.pos):
-                        if button["action"] == "solo":
-                            return "solo"  # Switch to solo mode
-                        elif button["action"] == "multiplayer":
-                            return "multiplayer"  # Switch to multiplayer mode
-                        elif button["action"] == "rules":
-                            self.show_rules = True  # Show rules
-                        elif button["action"] == "quit":
-                            pygame.quit()
-                            exit()
+            for button in buttons_to_check:
+                if button["rect"].collidepoint(event.pos):
+                    if button["action"] == "solo":
+                        return "solo"
+                    elif button["action"] == "multiplayer":
+                        self.show_multiplayer_options = True
+                        return "connect"
+                    elif button["action"] == "create_match":
+                        return "create_match"
+                    elif button["action"] == "join_match":
+                        return "join_match"
+                    elif button["action"] == "menu":
+                        self.show_multiplayer_options = False
+                    elif button["action"] == "quit":
+                        pygame.quit()
+                        exit()
         return None

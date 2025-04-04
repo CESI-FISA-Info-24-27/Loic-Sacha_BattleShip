@@ -212,7 +212,7 @@ class Board:
         grid_height = self.rows * self.cell_size
         margin_x_left = (screen.get_width() // 4) - (grid_width // 2)
         margin_x_right = (3 * screen.get_width() // 4) - (grid_width // 2)
-        margin_y = (screen.get_height() - grid_height) // 2 + 50
+        margin_y = (screen.get_height() - grid_height) // 2 - 50  # Ajustement pour laisser de la place en bas
 
         if self.winner == "player":
             victory_text = self.title_font.render("Victoire ! Vous avez gagné !", True, (255, 255, 255))
@@ -225,9 +225,27 @@ class Board:
             self._draw_grid(screen, margin_x_right, margin_y, self.enemy_grid, show_ships=False, show_hits=True, title="Plateau ennemi")
 
         # Boutons
-        self.reinit_button = reinit_button(screen, self.order_font, screen.get_width(), screen.get_height() - 50, text="Réinitialiser")
+        self.reinit_button = reinit_button(screen, self.order_font, screen.get_width(), screen.get_height() - 100, text="Réinitialiser")
         self.back_button = draw_back_button(screen, self.button_font, screen.get_width(), screen.get_height(), text="Retour")
 
+        # Boutons spécifiques au mode multijoueur
+        if self.server_url:
+            create_match_button = pygame.Rect(screen.get_width() // 2 - 220, screen.get_height() - 100, 200, 40)
+            join_match_button = pygame.Rect(screen.get_width() // 2 + 20, screen.get_height() - 100, 200, 40)
+            pygame.draw.rect(screen, (0, 128, 255), create_match_button)
+            pygame.draw.rect(screen, (0, 128, 255), join_match_button)
+            create_text = self.font.render("Créer Partie", True, (255, 255, 255))
+            join_text = self.font.render("Rejoindre Partie", True, (255, 255, 255))
+            screen.blit(create_text, (create_match_button.x + 10, create_match_button.y + 5))
+            screen.blit(join_text, (join_match_button.x + 10, join_match_button.y + 5))
+            self.create_match_button = create_match_button
+            self.join_match_button = join_match_button
+
+            # Affiche un message d'attente si nécessaire
+            if hasattr(self, "is_waiting_for_opponent") and self.is_waiting_for_opponent:
+                waiting_text = self.font.render("En attente d'un adversaire...", True, (255, 255, 0))
+                screen.blit(waiting_text, (screen.get_width() // 2 - waiting_text.get_width() // 2, screen.get_height() // 2))
+            
     def _draw_grid(self, screen, margin_x, margin_y, grid, show_ships, show_hits, title):
         """
         Draws a grid on the given screen with optional visual indicators for ships, hits, and titles.
@@ -307,27 +325,27 @@ class Board:
     def handle_event(self, event):
         """
         Handles events triggered by the user, such as mouse clicks.
-        Args:
-            event (pygame.event.Event): The event object containing information about the user action.
-        Returns:
-            str or None: Returns "menu" if the "Back" button is clicked to navigate to the main menu.
-                         Returns None for other actions.
-        Behavior:
-            - If the "Back" button is clicked, the function returns "menu" to indicate a transition to the main menu.
-            - If the "Reset" button is clicked, the game grid is reset by calling the `reset_grid` method.
-            - If boat placement is complete, the function processes a player's turn by calling the `play_turn` method.
-            - If boat placement is not complete, the function handles boat placement by calling the `place_boat` method.
         """
         if event.type == pygame.MOUSEBUTTONDOWN:
-            # Verify if the "Back" button is clicked
+            # Vérifiez si le bouton "Retour" est cliqué
             if self.back_button.collidepoint(event.pos):
                 return "menu"  # Retour au menu principal
 
-            # Verify if the "Reset" button is clicked
+            # Vérifiez si le bouton "Réinitialiser" est cliqué
             if self.reinit_button.collidepoint(event.pos):
                 self.reset_grid()
 
-            # If boat placement is complete, handle the player's turn
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                print(f"Clic détecté à la position : {event.pos}")
+                if self.create_match_button.collidepoint(event.pos):
+                    print("Bouton 'Créer Partie' cliqué")
+                    self.create_match()
+                if self.join_match_button.collidepoint(event.pos):
+                    print("Bouton 'Rejoindre Partie' cliqué")
+                    match_code = input("Entrez le code de la partie : ")
+                    self.join_match(match_code)
+
+            # Si le placement des bateaux est terminé, gérez le tour du joueur
             if self.placement_complete:
                 self.play_turn(event)
             else:
@@ -566,3 +584,55 @@ class Board:
         if hasattr(self, "current_boat_index"):
             del self.current_boat_index  
         print("Grille réinitialisée !")
+        
+    def create_match(self):
+        """Crée une partie sur le serveur."""
+        url = f"{self.server_url}/create_match"
+        data = {"player_id": self.player.name, "code": None}
+        try:
+            response = requests.post(url, json=data)
+            if response.status_code == 200:
+                match_data = response.json()
+                self.match_code = match_data.get("code")
+                print(f"Partie créée avec succès. Code de la partie : {self.match_code}")
+            else:
+                print(f"Erreur lors de la création de la partie : {response.json()}")
+        except requests.exceptions.RequestException as e:
+            print(f"Erreur de connexion au serveur : {e}")
+
+    def join_match(self, match_code):
+        """Rejoindre une partie existante."""
+        url = f"{self.server_url}/join_match"
+        data = {"player_id": self.player.name, "code": match_code}
+        try:
+            response = requests.post(url, json=data)
+            if response.status_code == 200:
+                match_data = response.json()
+                self.match_code = match_code
+                self.enemy = match_data["players"][1] if match_data["players"][0] == self.player.name else match_data["players"][0]
+                print(f"Rejoint la partie avec succès. Adversaire : {self.enemy}")
+            else:
+                print(f"Erreur lors de la connexion à la partie : {response.json()}")
+        except requests.exceptions.RequestException as e:
+            print(f"Erreur de connexion au serveur : {e}")
+            
+    def check_match_status(self):
+        """Vérifie l'état de la partie."""
+        url = f"{self.server_url}/match_status"
+        params = {"code": self.match_code}
+        try:
+            response = requests.get(url, params=params)
+            if response.status_code == 200:
+                status_data = response.json()
+                if status_data["status"] == "active":
+                    print("La partie est prête à commencer.")
+                    self.is_waiting_for_opponent = False  # Arrête l'attente
+                    return True
+                else:
+                    print("En attente d'un adversaire...")
+                    return False
+            else:
+                print(f"Erreur lors de la vérification de l'état de la partie : {response.json()}")
+        except requests.exceptions.RequestException as e:
+            print(f"Erreur de connexion au serveur : {e}")
+        return False
