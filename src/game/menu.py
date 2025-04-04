@@ -47,7 +47,7 @@ class Menu:
             self.buttons (list): A list of dictionaries where each dictionary represents a button with:
                 - "label" (str): The text displayed on the button.
                 - "rect" (pygame.Rect): The rectangle defining the button's position and dimensions.
-                - "action" (str): The action associated with the button (e.g., "solo", "rules", "quit").
+                - "action" (str): The action associated with the button (e.g., "solo", "choose_difficulty", "rules", "quit").
         """
         """Updates the dimensions and positions of the buttons based on the window size."""
         button_width = int(self.screen_width * 0.25)
@@ -56,8 +56,9 @@ class Menu:
 
         self.buttons = [
             {"label": "Mode Solo", "rect": pygame.Rect(button_x, int(self.screen_height * 0.3), button_width, button_height), "action": "solo"},
-            {"label": "Règles", "rect": pygame.Rect(button_x, int(self.screen_height * 0.4), button_width, button_height), "action": "rules"},
-            {"label": "Quitter", "rect": pygame.Rect(button_x, int(self.screen_height * 0.5), button_width, button_height), "action": "quit"},
+            {"label": "Difficulté", "rect": pygame.Rect(button_x, int(self.screen_height * 0.4), button_width, button_height), "action": "choose_difficulty"},
+            {"label": "Règles", "rect": pygame.Rect(button_x, int(self.screen_height * 0.5), button_width, button_height), "action": "rules"},
+            {"label": "Quitter", "rect": pygame.Rect(button_x, int(self.screen_height * 0.6), button_width, button_height), "action": "quit"},
         ]
 
     def draw(self, screen):
