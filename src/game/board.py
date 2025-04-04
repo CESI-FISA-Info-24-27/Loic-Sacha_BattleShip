@@ -173,7 +173,7 @@ class Board:
         screen.fill((30, 30, 30))  # Dark gray background
 
         # Draw the title
-        title = self.title_font.render("Battle Ship Royale - Mode Solo", True, (255, 255, 255))
+        title = self.title_font.render("Battle Ship - Mode Solo", True, (255, 255, 255))
         screen.blit(title, (screen.get_width() // 2 - title.get_width() // 2, 10))
 
         # Draw player names

@@ -120,13 +120,13 @@ class Menu:
             screen (pygame.Surface): The Pygame surface where the main menu will be drawn.
         The main menu includes:
             - A dark gray background.
-            - A centered title "Battle Ship Royale" at the top.
+            - A centered title "Battle Ship" at the top.
             - A list of buttons with labels, drawn with a blue background and white border.
             - The version information displayed in the bottom-right corner.
         """
         """Draws the main menu."""
         screen.fill((30, 30, 30))  # Dark gray background
-        title = self.font.render("Battle Ship Royale", True, (255, 255, 255))
+        title = self.font.render("Battle Ship", True, (255, 255, 255))
         screen.blit(title, (self.screen_width // 2 - title.get_width() // 2, int(self.screen_height * 0.1)))
 
         for button in self.buttons:

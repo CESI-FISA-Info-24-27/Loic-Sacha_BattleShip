@@ -23,7 +23,7 @@ def main():
     pygame.init()
     screen_width, screen_height = 1200, 800
     screen = pygame.display.set_mode((screen_width, screen_height), pygame.RESIZABLE)
-    pygame.display.set_caption("Battle Ship Royale")
+    pygame.display.set_caption("Battle Ship")
 
     # Create players
     player = Player(name="Rohan FOSSE")

@@ -26,7 +26,7 @@ def test_main_initialization(mocker):
     # Assertions
     pygame.init.assert_called_once()
     pygame.display.set_mode.assert_called_once_with((1200, 800), pygame.RESIZABLE)
-    pygame.display.set_caption.assert_called_once_with("Battle Ship Royale")
+    pygame.display.set_caption.assert_called_once_with("Battle Ship")
     pygame.quit.assert_called_once()
 
 def test_main_menu_to_game_transition(mocker):
