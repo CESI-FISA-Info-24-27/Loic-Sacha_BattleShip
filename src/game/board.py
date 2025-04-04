@@ -4,6 +4,7 @@ from game.button import draw_back_button  # Import directly from button.py
 from game.button import reinit_button
 from utils.boat_type import BoatType 
 import random
+import requests
 from game.ia import AI
 
 class Board:
@@ -51,18 +52,18 @@ class Board:
             Checks if either the player or the AI has won the game by sinking all enemy boats.
         reset_grid(self):
             Resets the game board, clearing all boats and hits, and allowing for a new game setup."""
-    def __init__(self, rows=10, cols=10, cell_size=40, player=None, enemy=None):
+    def __init__(self, rows=10, cols=10, cell_size=40, player=None, enemy=None, server_url=None):
         self.rows = rows
         self.cols = cols
         self.cell_size = cell_size
         self.player_grid = [[{"ai_hit": False, "ship": False} for _ in range(cols)] for _ in range(rows)]
         self.enemy_grid = [[{"player_hit": False, "ship": False} for _ in range(cols)] for _ in range(rows)]
-        self.font = pygame.font.SysFont(None, 24)  # Font for numbers and letters
+        self.font = pygame.font.SysFont(None, 24)
         self.order_font = pygame.font.SysFont(None, 20)
-        self.title_font = pygame.font.SysFont(None, 48)  # Font for the title
+        self.title_font = pygame.font.SysFont(None, 48)
         self.select_font = pygame.font.SysFont(None, 40)
-        self.button_font = pygame.font.SysFont(None, 30)  # Font for the button
-        self.back_button = None  # Back button
+        self.button_font = pygame.font.SysFont(None, 30)
+        self.back_button = None
         self.reinit_button = None
         self.winner = None
         self.player_hits = 0
@@ -71,14 +72,57 @@ class Board:
         # Assign player and enemy
         self.player = player
         self.enemy = enemy
-        self.ai = AI(strategy="smart")  # Choosing the strategy
+        self.server_url = "https://rfosse.pythonanywhere.com"
 
         # Initialize the placement_complete attribute
-        self.placement_complete = False  # Indicates whether all boats have been placed
+        self.placement_complete = False
 
-        # Generate the enemy's grid if it does not already exist
-        if self.enemy and not self.enemy.boats:
-            self.place_enemy_boats()
+        # Initialiser les données du serveur
+        if self.server_url:
+            self.register_player()
+            
+    def register_player(self):
+        """Enregistre le joueur sur le serveur."""
+        url = f"{self.server_url}/auto_join"
+        data = {"username": self.player.name, "port": 5000}  # Port fictif
+        try:
+            response = requests.post(url, json=data)
+            if response.status_code == 200:
+                print(f"Joueur enregistré : {response.json()}")
+            else:
+                print(f"Erreur lors de l'enregistrement : {response.json()}")
+        except requests.exceptions.RequestException as e:
+            print(f"Erreur de connexion au serveur : {e}")
+            
+    def send_move(self, row, col):
+        """Envoie un mouvement au serveur."""
+        url = f"{self.server_url}/send_move"
+        data = {"player_id": self.player.name, "row": row, "col": col}
+        try:
+            response = requests.post(url, json=data)
+            if response.status_code == 200:
+                print(f"Mouvement envoyé : {response.json()}")
+            else:
+                print(f"Erreur lors de l'envoi du mouvement : {response.json()}")
+        except requests.exceptions.RequestException as e:
+            print(f"Erreur de connexion au serveur : {e}")
+
+    def get_enemy_data(self):
+        """Récupère les données de l'adversaire depuis le serveur."""
+        url = f"{self.server_url}/players"
+        try:
+            response = requests.get(url)
+            if response.status_code == 200:
+                players = response.json()
+                for player in players:
+                    if player["username"] != self.player.name:
+                        self.enemy = player
+                        print(f"Adversaire trouvé : {self.enemy}")
+                        break
+            else:
+                print(f"Erreur lors de la récupération des joueurs : {response.json()}")
+        except requests.exceptions.RequestException as e:
+            print(f"Erreur de connexion au serveur : {e}")
 
     def place_enemy_boats(self):
         """
@@ -143,62 +187,46 @@ class Board:
 
     def draw(self, screen):
         """
-        Draws the game board and UI elements on the screen.
-        This method is responsible for rendering the game interface, including the title, 
-        player and enemy names, grids, and buttons. It visually represents the player's 
-        and enemy's game boards, as well as the current state of the game.
-        Args:
-            screen (pygame.Surface): The surface on which the game elements will be drawn.
-        Elements drawn:
-            - Background with a dark gray color.
-            - Title of the game at the top center of the screen.
-            - Player and enemy names displayed at the top left and top right corners, respectively.
-            - Two grids:
-                - Left grid: Displays the player's ships and the AI's hits.
-                - Right grid: Displays the player's hits on the enemy's ships.
-            - A "Reinitialize" button at the bottom center of the screen.
-            - A "Back" button at the bottom right of the screen.
+        Dessine le plateau de jeu et les éléments de l'interface utilisateur.
+        Gère l'affichage pour le mode IA et multijoueur.
         """
-        screen.fill((30, 30, 30))  # Dark gray background
-        
-        # Draw the title
-        title = self.title_font.render("Battle Ship Royale - Mode Solo", True, (255, 255, 255))
+        screen.fill((30, 30, 30))  # Fond gris foncé
+
+        # Titre
+        mode = "Multijoueur" if self.server_url else "Mode Solo"
+        title = self.title_font.render(f"Battle Ship Royale - {mode}", True, (255, 255, 255))
         screen.blit(title, (screen.get_width() // 2 - title.get_width() // 2, 10))
 
-        # Draw player names
+        # Noms des joueurs
         player_text = self.font.render(f"Player: {self.player.name}", True, (255, 255, 255))
-        enemy_text = self.font.render(f"Enemy: {self.enemy.name}", True, (255, 255, 255))
+        if self.server_url:
+            enemy_name = self.enemy["username"] if self.enemy else "En attente..."
+        else:
+            enemy_name = self.enemy.name if self.enemy else "IA"
+        enemy_text = self.font.render(f"Enemy: {enemy_name}", True, (255, 255, 255))
         screen.blit(player_text, (10, 60))
         screen.blit(enemy_text, (screen.get_width() - enemy_text.get_width() - 10, 60))
 
-        # Calculate margins for the two grids
+        # Grilles
         grid_width = self.cols * self.cell_size
         grid_height = self.rows * self.cell_size
         margin_x_left = (screen.get_width() // 4) - (grid_width // 2)
         margin_x_right = (3 * screen.get_width() // 4) - (grid_width // 2)
-        margin_y = (screen.get_height() - grid_height) // 2 + 50  # Offset to leave space for the title
+        margin_y = (screen.get_height() - grid_height) // 2 + 50
 
         if self.winner == "player":
-        # Afficher un message de victoire
             victory_text = self.title_font.render("Victoire ! Vous avez gagné !", True, (255, 255, 255))
             screen.blit(victory_text, (screen.get_width() // 2 - victory_text.get_width() // 2, screen.get_height() // 2 - victory_text.get_height() // 2))
         elif self.winner == "ia":
-            # Afficher un message de défaite
-            defeat_text = self.title_font.render("Défaite ! L'IA a gagné !", True, (255, 255, 255))
+            defeat_text = self.title_font.render("Défaite ! L'adversaire a gagné !", True, (255, 255, 255))
             screen.blit(defeat_text, (screen.get_width() // 2 - defeat_text.get_width() // 2, screen.get_height() // 2 - defeat_text.get_height() // 2))
         else:
-            # Draw the left grid (Player's ships and AI's hits)
             self._draw_grid(screen, margin_x_left, margin_y, self.player_grid, show_ships=True, show_hits=True, title="Votre plateau")
-
-            # Draw the right grid (Player's hits on the enemy's ships)
             self._draw_grid(screen, margin_x_right, margin_y, self.enemy_grid, show_ships=False, show_hits=True, title="Plateau ennemi")
 
-        # Draw the reinitialization button
+        # Boutons
         self.reinit_button = reinit_button(screen, self.order_font, screen.get_width(), screen.get_height() - 50, text="Réinitialiser")
-
-        # Draw the back button
         self.back_button = draw_back_button(screen, self.button_font, screen.get_width(), screen.get_height(), text="Retour")
-
 
     def _draw_grid(self, screen, margin_x, margin_y, grid, show_ships, show_hits, title):
         """
@@ -412,31 +440,10 @@ class Board:
     
     def play_turn(self, event):
         """
-        Handles the logic for a single turn in the game, alternating between the player and the AI.
-        Parameters:
-            event (pygame.event.Event): The event triggered by the player, typically a mouse click.
-        Player's Turn:
-            - Checks if it's the player's turn to play.
-            - Determines the grid cell clicked by the player based on the mouse position.
-            - Validates if the clicked cell is within the enemy grid bounds.
-            - If the cell has already been targeted, informs the player and ends the turn.
-            - If the cell contains an enemy ship, marks it as a hit and notifies the player.
-            - If the cell does not contain a ship, marks it as a miss and notifies the player.
-            - Ends the player's turn and switches to the AI's turn.
-        AI's Turn:
-            - Executes the AI's move by selecting a cell on the player's grid.
-            - If the selected cell contains a player's ship, marks it as a hit and updates the AI's strategy.
-            - If the selected cell does not contain a ship, marks it as a miss and updates the AI's strategy.
-            - Ends the AI's turn and switches back to the player's turn.
-        Notes:
-            - The player's grid and the enemy's grid are represented as 2D arrays of cells.
-            - Each cell is a dictionary containing information about whether it contains a ship and whether it has been hit.
-            - The AI's behavior is determined by the `choose_move` and `update_last_hit` methods.
-        Raises:
-            AttributeError: If the `player_turn` attribute is not initialized properly.
+        Gère le tour de jeu en fonction du mode (IA ou multijoueur).
         """
         if not hasattr(self, "player_turn"):
-            self.player_turn = True 
+            self.player_turn = True
 
         if self.player_turn:
             if event and event.type == pygame.MOUSEBUTTONDOWN:
@@ -453,47 +460,65 @@ class Board:
                     cell = self.enemy_grid[row][col]
 
                     if cell["player_hit"]:
-                        print("You have already targeted this cell.")
+                        print("Vous avez déjà ciblé cette case.")
                         return
 
-                    if cell["ship"]:
-                        print(f"Player hit an enemy ship at ({row}, {col})!")
-                        cell["player_hit"] = True
-                        self.player_hits += 1  # Increment player's successful hits
+                    # Mode multijoueur : envoyer le coup au serveur
+                    if self.server_url:
+                        self.send_move(row, col)
+                        # Simuler un résultat pour l'instant (à remplacer par une réponse du serveur)
+                        if cell["ship"]:
+                            print(f"Touché à ({row}, {col}) !")
+                            cell["player_hit"] = True
+                            self.player_hits += 1
+                        else:
+                            print(f"Manqué à ({row}, {col}).")
+                            cell["player_hit"] = True
+                    # Mode classique : IA
                     else:
-                        print(f"Player missed at ({row}, {col}).")
-                        cell["player_hit"] = True
+                        if cell["ship"]:
+                            print(f"Touché à ({row}, {col}) !")
+                            cell["player_hit"] = True
+                            self.player_hits += 1
+                        else:
+                            print(f"Manqué à ({row}, {col}).")
+                            cell["player_hit"] = True
 
-                    # Check if the player has won
+                    # Vérifier si le joueur a gagné
                     if self.player_hits == 17:
                         self.winner = "player"
-                        return  # End the game if the player has won
+                        return
 
-                    self.player_turn = False  # Switch to AI's turn
+                    self.player_turn = False  # Passer au tour de l'adversaire
 
         if not self.player_turn:
-            print("AI's turn...")
-            row, col = self.ai.choose_move(self.player_grid, self.player.boats)
-            cell = self.player_grid[row][col]
-
-            if cell["ship"]:
-                print(f"The AI hit your ship at ({row}, {col})!")
-                cell["ai_hit"] = True
-                self.ai_hits += 1  # Increment AI's successful hits
-                self.ai.update_last_hit(row, col, hit=True)
+            if self.server_url:
+                print("En attente du tour de l'adversaire...")
+                # Ici, vous pouvez ajouter la logique pour récupérer le mouvement de l'adversaire depuis le serveur
+                self.player_turn = True
             else:
-                print(f"The AI missed at ({row}, {col}).")
-                cell["ai_hit"] = True
-                self.ai.update_last_hit(row, col, hit=False)
+                print("Tour de l'IA...")
+                row, col = self.ai.choose_move(self.player_grid, self.player.boats)
+                cell = self.player_grid[row][col]
 
-            # Check if the AI has won
-            if self.ai_hits == 17:
-                print("AI has won the game!")
-                self.winner = "ia"
-                return  # End the game if the AI has won
+                if cell["ship"]:
+                    print(f"L'IA a touché votre bateau à ({row}, {col}) !")
+                    cell["ai_hit"] = True
+                    self.ai_hits += 1
+                    self.ai.update_last_hit(row, col, hit=True)
+                else:
+                    print(f"L'IA a manqué à ({row}, {col}).")
+                    cell["ai_hit"] = True
+                    self.ai.update_last_hit(row, col, hit=False)
 
-            self.player_turn = True
-        
+                # Vérifier si l'IA a gagné
+                if self.ai_hits == 17:
+                    print("L'IA a gagné la partie !")
+                    self.winner = "ia"
+                    return
+
+                self.player_turn = True
+            
     def check_victory(self):
         """
         Determines the winner of the game by checking the state of the boats for both players.

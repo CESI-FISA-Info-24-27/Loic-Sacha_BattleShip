@@ -56,8 +56,9 @@ class Menu:
 
         self.buttons = [
             {"label": "Mode Solo", "rect": pygame.Rect(button_x, int(self.screen_height * 0.3), button_width, button_height), "action": "solo"},
-            {"label": "Règles", "rect": pygame.Rect(button_x, int(self.screen_height * 0.4), button_width, button_height), "action": "rules"},
-            {"label": "Quitter", "rect": pygame.Rect(button_x, int(self.screen_height * 0.5), button_width, button_height), "action": "quit"},
+            {"label": "Multijoueur", "rect": pygame.Rect(button_x, int(self.screen_height * 0.4), button_width, button_height), "action": "multiplayer"},
+            {"label": "Règles", "rect": pygame.Rect(button_x, int(self.screen_height * 0.5), button_width, button_height), "action": "rules"},
+            {"label": "Quitter", "rect": pygame.Rect(button_x, int(self.screen_height * 0.6), button_width, button_height), "action": "quit"},
         ]
 
     def draw(self, screen):
@@ -135,6 +136,8 @@ class Menu:
                     if button["rect"].collidepoint(event.pos):
                         if button["action"] == "solo":
                             return "solo"  # Switch to solo mode
+                        elif button["action"] == "multiplayer":
+                            return "multiplayer"  # Switch to multiplayer mode
                         elif button["action"] == "rules":
                             self.show_rules = True  # Show rules
                         elif button["action"] == "quit":
